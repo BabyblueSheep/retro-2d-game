@@ -8,7 +8,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\MoonWorks\MoonWorks.csproj" />
+		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

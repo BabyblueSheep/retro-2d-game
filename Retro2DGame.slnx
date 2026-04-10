@@ -1,4 +1,4 @@
 ﻿<Solution>
   <Project Path="src\Retro2DGame\Retro2DGame.csproj"/>
-  <Project Path="src\MoonWorks\MoonWorks.csproj"/>
+  <Project Path="src\SDL3-CS\SDL3\SDL3.Core.csproj"/>
 </Solution>
