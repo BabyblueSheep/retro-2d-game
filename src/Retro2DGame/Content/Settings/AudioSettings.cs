@@ -1,4 +1,4 @@
-﻿using Game.Core.Settings.Fields;
+﻿using Game.Core.Game.Settings.Fields;
 using System;
 using System.Collections.Generic;
 using System.Text;

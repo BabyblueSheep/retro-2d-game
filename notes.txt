@@ -1,0 +1,3 @@
+credit sdl-cs bindings used
+credit moonworks and include their licenses due to code being used
+credit sdl

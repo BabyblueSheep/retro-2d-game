@@ -6,14 +6,8 @@ namespace Game.Core.SDL3.Extensions;
 
 internal static class ColorExtensions
 {
-    public static SDL.SDL_FColor ToFColor(this Color color)
+    public static SDL.FColor ToFColor(this Color color)
     {
-        return new SDL.SDL_FColor()
-        {
-            r = color.R / byte.MaxValue,
-            g = color.G / byte.MaxValue,
-            b = color.B / byte.MaxValue,
-            a = color.A / byte.MaxValue
-        };
+        return new SDL.FColor(color.R / byte.MaxValue, color.G / byte.MaxValue, color.B / byte.MaxValue, color.A / byte.MaxValue);
     }
 }

@@ -6,6 +6,8 @@ internal sealed class GraphicsDevice : IDisposable
 {
     public nint Handle { get; }
 
+    public string Backend { get; }
+
     public bool IsDisposed { get; private set; }
 
     public GraphicsDevice(SDL.SDL_GPUShaderFormat formatFlags, bool debugMode, string? name)
@@ -16,6 +18,9 @@ internal sealed class GraphicsDevice : IDisposable
         {
             throw new Exception($"Couldn't create GraphicsDevice: {SDL.SDL_GetError()}");
         }
+
+        var backend = SDL.SDL_GetGPUDeviceDriver(Handle) ?? throw new Exception($"Couldn't get GraphicsDevice backend: {SDL.SDL_GetError()}");
+        Backend = backend;
     }
 
     public void ClaimWindow(Window window)
@@ -34,10 +39,8 @@ internal sealed class GraphicsDevice : IDisposable
         {
             if (disposing)
             {
-                
+                SDL.SDL_DestroyGPUDevice(Handle);
             }
-
-            SDL.SDL_DestroyGPUDevice(Handle);
 
             IsDisposed = true;
         }

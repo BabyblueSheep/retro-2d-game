@@ -16,8 +16,7 @@ internal sealed class CommandBuffer
         var handle = SDL.SDL_AcquireGPUCommandBuffer(device.Handle);
         if (handle == nint.Zero)
         {
-            SDL.SDL_LogError((int)SDL.SDL_LogCategory.SDL_LOG_CATEGORY_ERROR, $"Couldn't properly acquire GPU device: {SDL.SDL_GetError()}");
-            return null;
+            throw new Exception($"Couldn't properly acquire GPU device: {SDL.SDL_GetError()}");
         }
         var commandBuffer = new CommandBuffer(handle);
         return commandBuffer;
@@ -25,7 +24,6 @@ internal sealed class CommandBuffer
 
     public void Submit()
     {
-
-
+        SDL.SDL_SubmitGPUCommandBuffer(Handle);
     }
 }

@@ -1,8 +1,10 @@
-﻿using Retro2DGame.Core.SDL3;
-using Retro2DGame.Core.SDL3.Rendering;
+﻿using Game.Core.SDL3;
+using Game.Core.SDL3.Extensions;
+using Game.Core.SDL3.Rendering;
+using Game.Core.SDL3.Rendering.Structures;
 using SDL3;
 using System.Diagnostics;
-using System.Reflection.Metadata;
+using System.Drawing;
 
 namespace Game.Core.Game;
 
@@ -15,6 +17,8 @@ internal sealed class GameEngine : IDisposable
     private readonly TimeSpan _tickDuration;
     private readonly int _maxUpdateAmountPerTick;
 
+    private GraphicsPipeline _pipeline;
+
     public GraphicsDevice GraphicsDevice { get; }
 
     public Inputs Inputs { get; }
@@ -24,7 +28,11 @@ internal sealed class GameEngine : IDisposable
 
     public bool IsDisposed { get; private set; }
 
-    public GameEngine(TimeSpan tickDuration, int maxUpdateAmountPerTick)
+    public GameEngine
+    (
+        Window window,
+        TimeSpan tickDuration, int maxUpdateAmountPerTick
+    )
     {
         _timeTracker = new Stopwatch();
         _previousElapsedTime = _timeTracker.Elapsed;
@@ -33,10 +41,29 @@ internal sealed class GameEngine : IDisposable
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
 
-        GraphicsDevice = new GraphicsDevice(SDL.GPUShaderFormat.SPIRV | SDL.GPUShaderFormat.DXIL | SDL.GPUShaderFormat.MetalLib, true, null);
+        GraphicsDevice = new GraphicsDevice(SDL.GPUShaderFormat.SPIRV | SDL.GPUShaderFormat.DXIL | SDL.GPUShaderFormat.DXBC | SDL.GPUShaderFormat.MetalLib, true, "direct3d12");
+        GraphicsDevice.ClaimWindow(window);
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
+
+        var vertexShader = Shader.Load(GraphicsDevice, "PositionColor.vert");
+        var fragmentShader = Shader.Load(GraphicsDevice, "SolidColor.frag");
+
+        SDL.LogInfo(SDL.LogCategory.GPU, $"{SDL.GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle)}");
+
+        _pipeline = GraphicsPipeline.Create<PositionColorVertex>
+        (
+            GraphicsDevice,
+            SDL.GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle),
+
+            vertexShader, fragmentShader,
+            SDL.GPURasterizerState.CCW_CullNone,
+            SDL.GPUColorTargetBlendState.Opaque
+        );
+
+        //vertexShader.Release(GraphicsDevice);
+        //fragmentShader.Release(GraphicsDevice);
     }
 
     public void Start()
@@ -93,7 +120,14 @@ internal sealed class GameEngine : IDisposable
 
         var commandBuffer = CommandBuffer.AcquireFromGraphicsDevice(GraphicsDevice);
         Debug.Assert(commandBuffer != null);
-        var swapchainTexture = Texture.AcquireSwapchainTexture(commandBuffer, window);
+        var swapchainTexture = Texture.WaitAndAcquireSwapchainTexture(commandBuffer, GraphicsDevice, window);
+
+        RenderPass? renderPass = null;
+
+        if (swapchainTexture != null)
+        {
+            renderPass = RenderPass.Begin(commandBuffer, swapchainTexture, Color.Red.ToFColor());
+        }
 
         var currentGameStatesCopy = GameStates.Copy();
         foreach (var state in currentGameStatesCopy)
@@ -105,8 +139,15 @@ internal sealed class GameEngine : IDisposable
                 state.FixedUpdate(_tickDuration);
             }
 
-            state.Render(frameProgress);
+            if (swapchainTexture != null)
+            {
+                state.Render(frameProgress);
+            }
         }
+
+
+
+        renderPass?.End();
 
         commandBuffer.Submit();
     }

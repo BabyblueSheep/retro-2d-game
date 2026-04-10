@@ -1,12 +1,6 @@
-﻿using Retro2DGame.Core.SDL3.Rendering;
-using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using SDL3;
 
-namespace Game.Core.SDL3.Rendering;
+namespace Retro2DGame.Core.SDL3.Rendering;
 
 internal sealed class RenderPass
 {
@@ -17,23 +11,28 @@ internal sealed class RenderPass
         Handle = handle;
     }
 
-    public static RenderPass Begin(CommandBuffer commandBuffer, Texture textureTarget, SDL.FColor clearColor)
+    public static RenderPass Begin(CommandBuffer commandBuffer, Texture textureTarget, SDL.SDL_FColor clearColor)
     {
-        var colorTargetInfo = new SDL.GPUColorTargetInfo
+        var colorTargetInfo = new SDL.SDL_GPUColorTargetInfo
         {
-            Texture = textureTarget.Handle,
-            ClearColor = clearColor,
-            LoadOp = SDL.GPULoadOp.Clear,
-            StoreOp = SDL.GPUStoreOp.Store,
+            texture = textureTarget.Handle,
+            clear_color = clearColor,
+            load_op = SDL.SDL_GPULoadOp.SDL_GPU_LOADOP_CLEAR,
+            store_op = SDL.SDL_GPUStoreOp.SDL_GPU_STOREOP_STORE,
         };
 
-        var colorTargetInfoPointer = SDL.StructureToPointer<SDL.GPUColorTargetInfo>(colorTargetInfo);
+        var colorTargetInfoPointer = SDL.SDL_StructureToPointer<SDL.SDL_GPUColorTargetInfo>(colorTargetInfo);
 
-        var handle = SDL.BeginGPURenderPass(commandBuffer.Handle, colorTargetInfoPointer, 1, nint.Zero);
+        var handle = SDL.SDL_BeginGPURenderPass(commandBuffer.Handle, colorTargetInfoPointer, 1, nint.Zero);
         var renderPass = new RenderPass(handle);
 
         Marshal.FreeHGlobal(colorTargetInfoPointer);
 
         return renderPass;
+    }
+
+    public void End()
+    {
+        SDL.SDL_EndGPURenderPass(Handle);
     }
 }
