@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="src\Retro2DGame\Retro2DGame.csproj"/>
+  <Project Path="src\MoonWorks\MoonWorks.csproj"/>
+</Solution>
