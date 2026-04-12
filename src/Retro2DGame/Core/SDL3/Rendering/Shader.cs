@@ -1,4 +1,5 @@
 ﻿using SDL3;
+using System.Runtime.InteropServices;
 
 namespace Retro2DGame.Core.SDL3.Rendering;
 
@@ -49,13 +50,17 @@ internal sealed class Shader
         GenerateDataFromBackend(graphicsDevice.Backend, out SDL.SDL_GPUShaderFormat shaderFormat, out string extension, out string entryPointName);
 
         var fileText = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "resources\\shaders\\compiled\\", $"{shaderName}.{extension}"));
+        if (fileText == null)
+        {
+            throw new Exception($"Couldn't find shader with name {shaderName}");
+        }
 
         var shaderCreateInfo = new SDL.SDL_GPUShaderCreateInfo
         {
-            code = SDL.SDL_StringToPointer(fileText),
+            //code = fileText.EncodeToUTF8Buffer(out var _),
             code_size = (nuint)fileText.Length,
 
-            entrypoint = entryPointName,
+            //entrypoint = EncodeToUTF8Buffer(out var _),
             stage = shaderName[^4..] switch
             {
                 "frag" => SDL.SDL_GPUShaderStage.SDL_GPU_SHADERSTAGE_FRAGMENT,
@@ -65,6 +70,12 @@ internal sealed class Shader
             format = shaderFormat
         };
 
+        unsafe
+        {
+            shaderCreateInfo.code = fileText.EncodeToUTF8Buffer(out var _);
+            shaderCreateInfo.entrypoint = entryPointName.EncodeToUTF8Buffer(out var _);
+        }
+
 
         var handle = SDL.SDL_CreateGPUShader(graphicsDevice.Handle, shaderCreateInfo);
         if (handle == nint.Zero)
@@ -72,6 +83,12 @@ internal sealed class Shader
             throw new Exception($"Couldn't create Shader: {SDL.SDL_GetError()}");
         }
         var shader = new Shader(handle);
+
+        unsafe
+        {
+            NativeMemory.Free(shaderCreateInfo.code);
+            NativeMemory.Free(shaderCreateInfo.entrypoint);
+        }
 
         return shader;
     }

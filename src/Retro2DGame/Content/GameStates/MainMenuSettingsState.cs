@@ -1,8 +1,4 @@
-﻿using Game.Core.Game;
-using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Retro2DGame.Core.Game;
 
 namespace Game.Content.GameStates;
 

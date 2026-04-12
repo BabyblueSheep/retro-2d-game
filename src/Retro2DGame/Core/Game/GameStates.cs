@@ -1,4 +1,4 @@
-﻿namespace Game.Core.Game;
+﻿namespace Retro2DGame.Core.Game;
 
 internal abstract class GameState : IDisposable
 {

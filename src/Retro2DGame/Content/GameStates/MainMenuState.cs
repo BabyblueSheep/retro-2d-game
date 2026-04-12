@@ -1,7 +1,6 @@
-using Game.Core.Game;
-using SDL3;
+using Retro2DGame.Core.Game;
 
-namespace Game.Content.GameStates;
+namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {

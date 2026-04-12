@@ -1,53 +1,53 @@
 ﻿using SDL3;
 
-namespace Game.Core.SDL3.Rendering.Structures;
+namespace Retro2DGame.Core.SDL3.Rendering.Structures;
 
 internal static class BlendStates
 {
-    extension(SDL.GPUColorTargetBlendState blendState)
+    extension(SDL.SDL_SDL_GPUColorTargetBlendState blendState)
     {
-        public static SDL.GPUColorTargetBlendState Opaque => new SDL.GPUColorTargetBlendState()
+        public static SDL.SDL_GPUColorTargetBlendState Opaque => new SDL.SDL_GPUColorTargetBlendState()
         {
-            EnableBlend = true,
-            AlphaBlendOp = SDL.GPUBlendOp.Add,
-            ColorBlendOp = SDL.GPUBlendOp.Add,
-            SrcColorBlendFactor = SDL.GPUBlendFactor.One,
-            SrcAlphaBlendFactor = SDL.GPUBlendFactor.One,
-            DstColorBlendFactor = SDL.GPUBlendFactor.Zero,
-            DstAlphaBlendFactor = SDL.GPUBlendFactor.Zero
+            enable_blend = true,
+            alpha_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            color_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            src_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+            src_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+            dst_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ZERO,
+            dst_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ZERO
         };
 
-        public static SDL.GPUColorTargetBlendState Additive => new SDL.GPUColorTargetBlendState()
+        public static SDL.SDL_GPUColorTargetBlendState Additive => new SDL.SDL_GPUColorTargetBlendState()
         {
-            EnableBlend = true,
-            AlphaBlendOp = SDL.GPUBlendOp.Add,
-            ColorBlendOp = SDL.GPUBlendOp.Add,
-            SrcColorBlendFactor = SDL.GPUBlendFactor.SrcAlpha,
-            SrcAlphaBlendFactor = SDL.GPUBlendFactor.SrcAlpha,
-            DstColorBlendFactor = SDL.GPUBlendFactor.One,
-            DstAlphaBlendFactor = SDL.GPUBlendFactor.One
+            enable_blend = true,
+            alpha_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            color_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            src_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+            src_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+            dst_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+            dst_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE
         };
 
-        public static SDL.GPUColorTargetBlendState AlphaBlend => new SDL.GPUColorTargetBlendState()
+        public static SDL.SDL_GPUColorTargetBlendState AlphaBlend => new SDL.SDL_GPUColorTargetBlendState()
         {
-            EnableBlend = true,
-            AlphaBlendOp = SDL.GPUBlendOp.Add,
-            ColorBlendOp = SDL.GPUBlendOp.Add,
-            SrcColorBlendFactor = SDL.GPUBlendFactor.One,
-            SrcAlphaBlendFactor = SDL.GPUBlendFactor.One,
-            DstColorBlendFactor = SDL.GPUBlendFactor.OneMinusSrcAlpha,
-            DstAlphaBlendFactor = SDL.GPUBlendFactor.OneMinusSrcAlpha
+            enable_blend = true,
+            alpha_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            color_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            src_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+            src_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE,
+            dst_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+            dst_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
         };
 
-        public static SDL.GPUColorTargetBlendState NonPremultiplied => new SDL.GPUColorTargetBlendState()
+        public static SDL.SDL_GPUColorTargetBlendState NonPremultiplied => new SDL.SDL_GPUColorTargetBlendState()
         {
-            EnableBlend = true,
-            AlphaBlendOp = SDL.GPUBlendOp.Add,
-            ColorBlendOp = SDL.GPUBlendOp.Add,
-            SrcColorBlendFactor = SDL.GPUBlendFactor.SrcAlpha,
-            SrcAlphaBlendFactor = SDL.GPUBlendFactor.SrcAlpha,
-            DstColorBlendFactor = SDL.GPUBlendFactor.OneMinusSrcAlpha,
-            DstAlphaBlendFactor = SDL.GPUBlendFactor.OneMinusSrcAlpha
+            enable_blend = true,
+            alpha_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            color_blend_op = SDL.SDL_GPUBlendOp.SDL_GPU_BLENDOP_ADD,
+            src_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+            src_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+            dst_color_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+            dst_alpha_blendfactor = SDL.SDL_GPUBlendFactor.SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
         };
     }
 }

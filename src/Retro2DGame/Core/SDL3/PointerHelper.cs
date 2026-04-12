@@ -10,11 +10,12 @@ namespace Retro2DGame.Core.SDL3;
 // https://github.com/MoonsideGames/MoonWorks/blob/main/src/InteropUtilities.cs
 internal static class PointerHelper
 {
-    public static unsafe (byte*, int) ToPointer(this string str)
+    public static unsafe byte* EncodeToUTF8Buffer(this string s, out int length)
     {
-        if (str == null)
+        if (s == null)
         {
-            return (null, 0);
+            length = 0;
+            return null;
         }
 
         length = Encoding.UTF8.GetByteCount(s) + 1;

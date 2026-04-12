@@ -1,11 +1,7 @@
 ﻿using Game.Core.SDL3.Rendering.Structures;
 using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 
-namespace Game.Core.SDL3.Rendering;
+namespace Retro2DGame.Core.SDL3.Rendering;
 
 internal sealed class GraphicsPipeline
 {
@@ -18,25 +14,25 @@ internal sealed class GraphicsPipeline
 
     public static GraphicsPipeline Create<T>(
         GraphicsDevice device,
-        SDL.GPUTextureFormat textureFormat,
+        SDL.SDL_GPUTextureFormat textureFormat,
 
         Shader vertexShader, Shader fragmentShader,
-        SDL.GPURasterizerState rasterizerState,
-        SDL.GPUColorTargetBlendState blendState
+        SDL.SDL_GPURasterizerState rasterizerState,
+        SDL.SDL_GPUColorTargetBlendState blendState
     ) where T : IVertexType
     {
-        var colortargetDescriptionsPointer = SDL.StructureArrayToPointer
+        var colortargetDescriptionsPointer = SDL.SDL_StructureArrayToPointer
         ([
-            new SDL.GPUColorTargetDescription()
+            new SDL.SDL_GPUColorTargetDescription()
             {
                 Format = textureFormat
             }
         ]);
 
-        /*var vertexAttributes = new SDL.GPUVertexAttribute[T.Offsets.Length];
+        /*var vertexAttributes = new SDL.SDL_GPUVertexAttribute[T.Offsets.Length];
         for (uint i = 0; i < vertexAttributes.Length; i++)
         {
-            vertexAttributes[i] = new SDL.GPUVertexAttribute()
+            vertexAttributes[i] = new SDL.SDL_GPUVertexAttribute()
             {
                 BufferSlot = 0,
 
@@ -46,64 +42,64 @@ internal sealed class GraphicsPipeline
             };
         }*/
 
-        var vertexAttributesPointer = SDL.StructureArrayToPointer
+        var vertexAttributesPointer = SDL.SDL_StructureArrayToPointer
         ([
-            new SDL.GPUVertexAttribute()
+            new SDL.SDL_GPUVertexAttribute()
             {
                 BufferSlot = 0,
 
                 Location = 0,
-                Format = SDL.GPUVertexElementFormat.Float3,
+                Format = SDL.SDL_GPUVertexElementFormat.Float3,
                 Offset = 0,
             },
-            new SDL.GPUVertexAttribute()
+            new SDL.SDL_GPUVertexAttribute()
             {
                 BufferSlot = 0,
 
                 Location = 1,
-                Format = SDL.GPUVertexElementFormat.Ubyte4Norm,
+                Format = SDL.SDL_GPUVertexElementFormat.Ubyte4Norm,
                 Offset = 16,
             }
         ]);
 
-        var vertexBufferDescriptionsPointer = SDL.StructureArrayToPointer
+        var vertexBufferDescriptionsPointer = SDL.SDL_StructureArrayToPointer
         ([
-            new SDL.GPUVertexBufferDescription()
+            new SDL.SDL_GPUVertexBufferDescription()
             {
                 Slot = 0,
-                InputRate = SDL.GPUVertexInputRate.Vertex,
+                InputRate = SDL.SDL_GPUVertexInputRate.Vertex,
                 Pitch = 32,
 
                 InstanceStepRate = 0,
             }
         ]);
 
-        var graphicsPipelineCreateInfo = new SDL.GPUGraphicsPipelineCreateInfo()
+        var graphicsPipelineCreateInfo = new SDL.SDL_GPUGraphicsPipelineCreateInfo()
         {
-            VertexShader = vertexShader.Handle,
-            FragmentShader = fragmentShader.Handle,
+            vertex_shader = vertexShader.Handle,
+            fragment_shader = fragmentShader.Handle,
 
-            PrimitiveType = SDL.GPUPrimitiveType.TriangleList,
+            primitive_type = SDL.SDL_GPUPrimitiveType.SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
 
-            VertexInputState = new SDL.GPUVertexInputState()
+            vertex_input_state = new SDL.SDL_GPUVertexInputState()
             {
-                VertexBufferDescriptions = vertexBufferDescriptionsPointer,
-                NumVertexBuffers = 1,
+                vertex_buffer_descriptions = vertexBufferDescriptionsPointer,
+                num_vertex_buffers = 1,
 
-                VertexAttributes = vertexAttributesPointer,
-                NumVertexAttributes = 2,
+                vertex_attributes = vertexAttributesPointer,
+                num_vertex_attributes = 2,
             },
 
-            TargetInfo = new SDL.GPUGraphicsPipelineTargetInfo()
+            target_info = new SDL.SDL_GPUGraphicsPipelineTargetInfo()
             {
-                ColorTargetDescriptions = colortargetDescriptionsPointer,
-                NumColorTargets = 1,
+                color_target_descriptions = colortargetDescriptionsPointer,
+                num_color_targets = 1,
             },
 
             /*VertexShader = vertexShader.Handle,
             FragmentShader = fragmentShader.Handle,
 
-            VertexInputState = new SDL.GPUVertexInputState()
+            VertexInputState = new SDL.SDL_GPUVertexInputState()
             {
                 VertexBufferDescriptions = vertexBufferDescriptionsPointer,
                 NumVertexBuffers = 1,
@@ -111,21 +107,21 @@ internal sealed class GraphicsPipeline
                 VertexAttributes = vertexAttributesPointer,
                 NumVertexAttributes = (uint)vertexAttributes.Length,
             },
-            PrimitiveType = SDL.GPUPrimitiveType.TriangleList,
+            PrimitiveType = SDL.SDL_GPUPrimitiveType.TriangleList,
 
             RasterizerState = rasterizerState,
 
-            TargetInfo = new SDL.GPUGraphicsPipelineTargetInfo()
+            TargetInfo = new SDL.SDL_GPUGraphicsPipelineTargetInfo()
             {
                 ColorTargetDescriptions = colortargetDescriptionsPointer,
                 NumColorTargets = 1,
             }*/
         };
 
-        var handle = SDL.CreateGPUGraphicsPipeline(device.Handle, graphicsPipelineCreateInfo);
+        var handle = SDL.SDL_CreateGPUGraphicsPipeline(device.Handle, graphicsPipelineCreateInfo);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create GraphicsPipeline: {SDL.GetError()}");
+            throw new Exception($"Couldn't create GraphicsPipeline: {SDL.SDL_GetError()}");
         }
         var graphicsPipeline = new GraphicsPipeline(handle);
 

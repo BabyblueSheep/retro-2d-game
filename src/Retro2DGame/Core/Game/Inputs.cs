@@ -1,6 +1,6 @@
 ﻿using SDL3;
 
-namespace Game.Core.Game;
+namespace Retro2DGame.Core.Game;
 
 internal struct InputButtonState
 {
@@ -31,22 +31,22 @@ internal enum InputButtonType
 
 internal sealed class Inputs
 {
-    private readonly Dictionary<InputButtonType, (HashSet<SDL.Scancode>, InputButtonState)> _buttonStates;
+    private readonly Dictionary<InputButtonType, (HashSet<SDL.SDL_Scancode>, InputButtonState)> _buttonStates;
 
     public Inputs()
     {
         _buttonStates = [];
 
-        _buttonStates.Add(InputButtonType.Up,           ([SDL.Scancode.W],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Left,         ([SDL.Scancode.A],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Right,        ([SDL.Scancode.D],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Down,         ([SDL.Scancode.S],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Up,           ([SDL.SDL_Scancode.SDL_SCANCODE_W],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Left,         ([SDL.SDL_Scancode.SDL_SCANCODE_A],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Right,        ([SDL.SDL_Scancode.SDL_SCANCODE_D],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Down,         ([SDL.SDL_Scancode.SDL_SCANCODE_S],      new InputButtonState()));
 
-        _buttonStates.Add(InputButtonType.MenuUp,       ([SDL.Scancode.W],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuLeft,     ([SDL.Scancode.A],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuRight,    ([SDL.Scancode.D],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuDown,     ([SDL.Scancode.S],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuConfirm,  ([SDL.Scancode.Return], new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuUp,       ([SDL.SDL_Scancode.SDL_SCANCODE_W],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuLeft,     ([SDL.SDL_Scancode.SDL_SCANCODE_A],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuRight,    ([SDL.SDL_Scancode.SDL_SCANCODE_D],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuDown,     ([SDL.SDL_Scancode.SDL_SCANCODE_S],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuConfirm,  ([SDL.SDL_Scancode.SDL_SCANCODE_RETURN], new InputButtonState()));
     }
 
     public void Reset()
@@ -73,15 +73,15 @@ internal sealed class Inputs
         }
     }
 
-    public void UpdateEvent(SDL.Event @event)
+    public void UpdateEvent(SDL.SDL_Event @event)
     {
-        if (@event.Key.Type == SDL.EventType.KeyDown)
+        if (@event.key.type == SDL.SDL_EventType.SDL_EVENT_KEY_DOWN)
         {
             foreach (var inputButtonType in _buttonStates.Keys)
             {
                 var buttonState = _buttonStates[inputButtonType];
 
-                if (buttonState.Item1.Contains(@event.Key.Scancode))
+                if (buttonState.Item1.Contains(@event.key.scancode))
                 {
                     buttonState.Item2 = buttonState.Item2.Update(true);
                 }
@@ -89,13 +89,13 @@ internal sealed class Inputs
                 _buttonStates[inputButtonType] = buttonState;
             }
         }
-        else if (@event.Key.Type == SDL.EventType.KeyUp)
+        else if (@event.key.type == SDL.SDL_EventType.SDL_EVENT_KEY_UP)
         {
             foreach (var inputButtonType in _buttonStates.Keys)
             {
                 var buttonState = _buttonStates[inputButtonType];
 
-                if (buttonState.Item1.Contains(@event.Key.Scancode))
+                if (buttonState.Item1.Contains(@event.key.scancode))
                 {
                     buttonState.Item2 = buttonState.Item2.Update(false);
                 }

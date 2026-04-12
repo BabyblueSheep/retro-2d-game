@@ -1,9 +1,6 @@
-﻿using Game.Core.Game;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Retro2DGame.Core.Game;
 
-namespace Game.Content.GameStates;
+namespace Retro2DGame.Content.GameStates;
 
 internal sealed class GameplayState : GameState
 {

@@ -1,6 +1,6 @@
-﻿using Game.Content.GameStates;
-using Game.Core.Game;
-using Retro2DGame.Core.SDL3;
+﻿using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.Game;
+using Retro2DGame.Content.GameStates;
 using SDL3;
 
 namespace Retro2DGame;

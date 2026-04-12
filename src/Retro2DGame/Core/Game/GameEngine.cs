@@ -1,12 +1,10 @@
-﻿using Game.Core.SDL3;
-using Game.Core.SDL3.Extensions;
-using Game.Core.SDL3.Rendering;
-using Game.Core.SDL3.Rendering.Structures;
+﻿using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.SDL3.Rendering;
 using SDL3;
 using System.Diagnostics;
 using System.Drawing;
 
-namespace Game.Core.Game;
+namespace Retro2DGame.Core.Game;
 
 internal sealed class GameEngine : IDisposable
 {
@@ -41,7 +39,7 @@ internal sealed class GameEngine : IDisposable
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
 
-        GraphicsDevice = new GraphicsDevice(SDL.GPUShaderFormat.SPIRV | SDL.GPUShaderFormat.DXIL | SDL.GPUShaderFormat.DXBC | SDL.GPUShaderFormat.MetalLib, true, "direct3d12");
+        GraphicsDevice = new GraphicsDevice(SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXIL | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXBC | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_MSL, true, "direct3d12");
         GraphicsDevice.ClaimWindow(window);
 
         Inputs = new Inputs();
@@ -50,17 +48,17 @@ internal sealed class GameEngine : IDisposable
         var vertexShader = Shader.Load(GraphicsDevice, "PositionColor.vert");
         var fragmentShader = Shader.Load(GraphicsDevice, "SolidColor.frag");
 
-        SDL.LogInfo(SDL.LogCategory.GPU, $"{SDL.GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle)}");
+        SDL.SDL_LogInfo(SDL.SDL_LogCategory.SDL_LOG_CATEGORY_GPU, $"{SDL.SDL_GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle)}");
 
-        _pipeline = GraphicsPipeline.Create<PositionColorVertex>
+        /*_pipeline = GraphicsPipeline.Create<PositionColorVertex>
         (
             GraphicsDevice,
-            SDL.GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle),
+            SDL.SDL_GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle),
 
             vertexShader, fragmentShader,
-            SDL.GPURasterizerState.CCW_CullNone,
-            SDL.GPUColorTargetBlendState.Opaque
-        );
+            SDL.SDL_GPURasterizerState.CCW_CullNone,
+            SDL.SDL_GPUColorTargetBlendState.Opaque
+        );*/
 
         //vertexShader.Release(GraphicsDevice);
         //fragmentShader.Release(GraphicsDevice);
@@ -90,14 +88,14 @@ internal sealed class GameEngine : IDisposable
     public void Run(Window window)
     {
         Inputs.Propagate();
-        while (SDL.PollEvent(out var @event))
+        while (SDL.SDL_PollEvent(out var @event))
         {
-            if ((SDL.EventType)@event.Type == SDL.EventType.KeyDown || (SDL.EventType)@event.Type == SDL.EventType.KeyUp)
+            if ((SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.KeyDown || (SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.KeyUp)
             {
                 Inputs.UpdateEvent(@event);
             }
 
-            if ((SDL.EventType)@event.Type == SDL.EventType.Quit)
+            if ((SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.Quit)
             {
                 RequestToDie();
             }
