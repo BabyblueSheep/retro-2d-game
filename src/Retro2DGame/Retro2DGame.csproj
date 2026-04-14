@@ -9,14 +9,15 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
 		<Content Include="resources\**\*.*">
 			<Link>resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <PackageReference Include="SDL3-CS" Version="3.4.2" />
+	  <PackageReference Include="SDL3-CS.Native" Version="3.4.2" />
 	</ItemGroup>
 
 </Project>

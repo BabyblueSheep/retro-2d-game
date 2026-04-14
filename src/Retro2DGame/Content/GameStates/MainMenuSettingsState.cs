@@ -1,6 +1,11 @@
 ﻿using Retro2DGame.Core.Game;
+using Retro2DGame.Core.SDL3;
+using SDL3;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Game.Content.GameStates;
+namespace Retro2DGame.Content.GameStates;
 
 internal class MainMenuSettingsState : GameState
 {
@@ -62,7 +67,7 @@ internal class MainMenuSettingsState : GameState
 
     }
 
-    public override void Render(double progress)
+    public override void Render(double progress, Window window, Renderer renderer)
     {
         /*
         if (_selectedOption == 0)

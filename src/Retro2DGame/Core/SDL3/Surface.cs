@@ -1,25 +1,33 @@
 ﻿using SDL3;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 using System.Text;
 
 namespace Retro2DGame.Core.SDL3;
 
-internal sealed class Window : IDisposable
+internal sealed class Surface : IDisposable
 {
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }
 
-    public Window(string title, int width, int height, SDL.WindowFlags windowFlags)
+    private Surface(nint handle)
     {
-        Handle = SDL.CreateWindow(title, width, height, windowFlags);
+        Handle = handle;
+    }
 
-        if (Handle == nint.Zero)
+    public static Surface LoadPNG(string filepath)
+    {
+        var handle = SDL.LoadPNG(filepath);
+
+        if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create window: {SDL.GetError()}");
+            throw new Exception($"Couldn't load PNG: {SDL.GetError()}");
         }
+
+        var surface = new Surface(handle);
+
+        return surface;
     }
 
     private void Dispose(bool disposing)
@@ -28,16 +36,16 @@ internal sealed class Window : IDisposable
         {
             if (disposing)
             {
-                
+
             }
 
-            SDL.DestroyWindow(Handle);
+            SDL.DestroySurface(Handle);
 
             IsDisposed = true;
         }
     }
 
-    ~Window()
+    ~Surface()
     {
         Dispose(false);
     }

@@ -1,4 +1,8 @@
 using Retro2DGame.Core.Game;
+using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.SDL3.Extensions;
+using SDL3;
+using System.Drawing;
 
 namespace Retro2DGame.Content.GameStates;
 
@@ -53,7 +57,7 @@ internal sealed class MainMenuState : GameState
 
     }
 
-    public override void Render(double progress)
+    public override void Render(double progress, Window window, Renderer renderer)
     {
         /*
         SDL.SetRenderDrawColorFloat(renderer, 0f, 0f, 0f, SDL.AlphaOpaqueFloat);

@@ -1,5 +1,5 @@
 ﻿using Retro2DGame.Core.SDL3;
-using Retro2DGame.Core.SDL3.Rendering;
+using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
 using System.Diagnostics;
 using System.Drawing;
@@ -15,10 +15,6 @@ internal sealed class GameEngine : IDisposable
     private readonly TimeSpan _tickDuration;
     private readonly int _maxUpdateAmountPerTick;
 
-    private GraphicsPipeline _pipeline;
-
-    public GraphicsDevice GraphicsDevice { get; }
-
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
 
@@ -28,7 +24,6 @@ internal sealed class GameEngine : IDisposable
 
     public GameEngine
     (
-        Window window,
         TimeSpan tickDuration, int maxUpdateAmountPerTick
     )
     {
@@ -39,29 +34,8 @@ internal sealed class GameEngine : IDisposable
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
 
-        GraphicsDevice = new GraphicsDevice(SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_SPIRV | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXIL | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_DXBC | SDL.SDL_GPUShaderFormat.SDL_GPU_SHADERFORMAT_MSL, true, "direct3d12");
-        GraphicsDevice.ClaimWindow(window);
-
         Inputs = new Inputs();
         GameStates = new GameStateStack();
-
-        var vertexShader = Shader.Load(GraphicsDevice, "PositionColor.vert");
-        var fragmentShader = Shader.Load(GraphicsDevice, "SolidColor.frag");
-
-        SDL.SDL_LogInfo(SDL.SDL_LogCategory.SDL_LOG_CATEGORY_GPU, $"{SDL.SDL_GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle)}");
-
-        /*_pipeline = GraphicsPipeline.Create<PositionColorVertex>
-        (
-            GraphicsDevice,
-            SDL.SDL_GetGPUSwapchainTextureFormat(GraphicsDevice.Handle, window.Handle),
-
-            vertexShader, fragmentShader,
-            SDL.SDL_GPURasterizerState.CCW_CullNone,
-            SDL.SDL_GPUColorTargetBlendState.Opaque
-        );*/
-
-        //vertexShader.Release(GraphicsDevice);
-        //fragmentShader.Release(GraphicsDevice);
     }
 
     public void Start()
@@ -85,17 +59,17 @@ internal sealed class GameEngine : IDisposable
         _accumulatedTime = TimeSpan.Zero;
     }
 
-    public void Run(Window window)
+    public void Run(Window window, Renderer renderer)
     {
         Inputs.Propagate();
-        while (SDL.SDL_PollEvent(out var @event))
+        while (SDL.PollEvent(out var @event))
         {
-            if ((SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.KeyDown || (SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.KeyUp)
+            if ((SDL.EventType)@event.Type == SDL.EventType.KeyDown || (SDL.EventType)@event.Type == SDL.EventType.KeyUp)
             {
                 Inputs.UpdateEvent(@event);
             }
 
-            if ((SDL.SDL_EventType)@event.Type == SDL.SDL_EventType.Quit)
+            if ((SDL.EventType)@event.Type == SDL.EventType.Quit)
             {
                 RequestToDie();
             }
@@ -116,16 +90,8 @@ internal sealed class GameEngine : IDisposable
 
         var frameProgress = _accumulatedTime / _tickDuration;
 
-        var commandBuffer = CommandBuffer.AcquireFromGraphicsDevice(GraphicsDevice);
-        Debug.Assert(commandBuffer != null);
-        var swapchainTexture = Texture.WaitAndAcquireSwapchainTexture(commandBuffer, GraphicsDevice, window);
-
-        RenderPass? renderPass = null;
-
-        if (swapchainTexture != null)
-        {
-            renderPass = RenderPass.Begin(commandBuffer, swapchainTexture, Color.Red.ToFColor());
-        }
+        renderer.SetDrawColorFloat(Color.Black.ToFColor());
+        renderer.Clear();
 
         var currentGameStatesCopy = GameStates.Copy();
         foreach (var state in currentGameStatesCopy)
@@ -137,17 +103,10 @@ internal sealed class GameEngine : IDisposable
                 state.FixedUpdate(_tickDuration);
             }
 
-            if (swapchainTexture != null)
-            {
-                state.Render(frameProgress);
-            }
+            state.Render(frameProgress, window, renderer);
         }
 
-
-
-        renderPass?.End();
-
-        commandBuffer.Submit();
+        renderer.Present();
     }
 
 
@@ -165,7 +124,7 @@ internal sealed class GameEngine : IDisposable
         {
             if (disposing)
             {
-                GraphicsDevice.Dispose();
+                
             }
 
             IsDisposed = true;
