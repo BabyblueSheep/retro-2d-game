@@ -38,6 +38,11 @@ internal sealed class Renderer : IDisposable
         return SDL.RenderPresent(Handle);
     }
 
+    public bool RenderTexture(Texture texture, SDL.FRect sourceRectangle, SDL.FRect destinationRectangle)
+    {
+        return SDL.RenderTexture(Handle, texture.Handle, sourceRectangle, destinationRectangle);
+    }
+
     private void Dispose(bool disposing)
     {
         if (!IsDisposed)

@@ -43,7 +43,7 @@ internal sealed class Program
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
 
-        gameEngine.GameStates.Push(new MainMenuState(gameEngine));
+        gameEngine.GameStates.Push(new MainMenuState(renderer, gameEngine));
 
         gameEngine.Start();
         while (!gameEngine.HasRequestedToDie)

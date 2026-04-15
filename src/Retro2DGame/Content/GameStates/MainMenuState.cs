@@ -8,11 +8,15 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
+    private Texture _testTexture;
+
     private int _selectedOption;
 
-    public MainMenuState(GameEngine engine) : base(engine)
+    public MainMenuState(Renderer renderer, GameEngine engine) : base(engine)
     {
-
+        var pngSurface = Surface.LoadPNG("resources/shoe.png");
+        _testTexture = Texture.CreateFromSurface(renderer, pngSurface);
+        pngSurface.Dispose();
     }
 
     public override void Update(TimeSpan delta)
@@ -59,6 +63,26 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress, Window window, Renderer renderer)
     {
+        renderer.SetDrawColorFloat(Color.Black.ToFColor());
+        renderer.Clear();
+
+        renderer.RenderTexture(
+            _testTexture,
+            new SDL.FRect()
+            {
+                X = 0,
+                Y = 0,
+                W = 1,
+                H = 1,
+            },
+            new SDL.FRect()
+            {
+                X = 0,
+                Y = 0,
+                W = 1,
+                H = 1,
+            }
+        );
         /*
         SDL.SetRenderDrawColorFloat(renderer, 0f, 0f, 0f, SDL.AlphaOpaqueFloat);
         SDL.RenderClear(renderer);
@@ -106,6 +130,8 @@ internal sealed class MainMenuState : GameState
             {
 
             }
+
+            _testTexture.Dispose();
 
             IsDisposed = true;
         }

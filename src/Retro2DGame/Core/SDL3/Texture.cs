@@ -5,27 +5,27 @@ using System.Text;
 
 namespace Retro2DGame.Core.SDL3;
 
-internal sealed class Surface : IDisposable
+internal sealed class Texture : IDisposable
 {
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }
 
-    private Surface(nint handle)
+    private Texture(nint handle)
     {
-        Handle = handle;
+        Handle = handle; 
     }
 
-    public static Surface LoadPNG(string filepath)
+    public static Texture CreateFromSurface(Renderer renderer, Surface surface)
     {
-        var handle = SDL.LoadPNG(filepath);
+        var handle = SDL.CreateTextureFromSurface(renderer.Handle, surface.Handle);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't load PNG: {SDL.GetError()}");
+            throw new Exception($"Couldn't create texture: {SDL.GetError()}");
         }
 
-        var surface = new Surface(handle);
-        return surface;
+        var texture = new Texture(handle);
+        return texture;
     }
 
     private void Dispose(bool disposing)
@@ -37,13 +37,13 @@ internal sealed class Surface : IDisposable
 
             }
 
-            SDL.DestroySurface(Handle);
+            SDL.DestroyTexture(Handle);
 
             IsDisposed = true;
         }
     }
 
-    ~Surface()
+    ~Texture()
     {
         Dispose(false);
     }
