@@ -8,6 +8,24 @@ namespace Retro2DGame.Core.SDL3;
 
 internal sealed class Window : IDisposable
 {
+    public int Width
+    {
+        get
+        {
+            SDL.GetWindowSize(Handle, out var width, out var height);
+            return width;
+        }
+    }
+
+    public int Height
+    {
+        get
+        {
+            SDL.GetWindowSize(Handle, out var width, out var height);
+            return height;
+        }
+    }
+
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }

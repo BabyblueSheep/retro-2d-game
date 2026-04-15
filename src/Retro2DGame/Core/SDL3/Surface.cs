@@ -7,6 +7,28 @@ namespace Retro2DGame.Core.SDL3;
 
 internal sealed class Surface : IDisposable
 {
+    public int Width
+    {
+        get
+        {
+            var structure = SDL.PointerToStructure<SDL.Surface>(Handle);
+            if (structure == null)
+                return 0;
+            return structure.Value.Width;
+        }
+    }
+
+    public int Height
+    {
+        get
+        {
+            var structure = SDL.PointerToStructure<SDL.Surface>(Handle);
+            if (structure == null)
+                return 0;
+            return structure.Value.Height;
+        }
+    }
+
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }

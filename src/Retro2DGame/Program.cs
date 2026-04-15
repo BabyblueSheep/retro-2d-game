@@ -12,7 +12,7 @@ internal sealed class Program
 	public const int DEFAULT_WINDOW_HEIGHT = 480;
 
 	public const int GAME_WIDTH = 256;
-	public const int GAME_HEIGHT = 240;
+	public const int GAME_HEIGHT = 256;
 
     static void Main(string[] args)
 	{

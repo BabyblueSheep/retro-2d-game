@@ -1,12 +1,43 @@
 ﻿using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Retro2DGame.Core.SDL3;
 
 internal sealed class Texture : IDisposable
 {
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SDLTexture
+    {
+        public SDL.PixelFormat Format;
+
+        public int Width;
+        public int Height;
+
+        public int Refcount;
+    }
+
+    public int Width
+    {
+        get
+        {
+            var structure = SDL.PointerToStructure<SDLTexture>(Handle);
+            if (structure == null)
+                return 0;
+            return structure.Value.Width;
+        }
+    }
+
+    public int Height
+    {
+        get
+        {
+            var structure = SDL.PointerToStructure<SDLTexture>(Handle);
+            if (structure == null)
+                return 0;
+            return structure.Value.Height;
+        }
+    }
+
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }
@@ -23,7 +54,6 @@ internal sealed class Texture : IDisposable
         {
             throw new Exception($"Couldn't create texture: {SDL.GetError()}");
         }
-
         var texture = new Texture(handle);
         return texture;
     }

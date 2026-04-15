@@ -72,15 +72,15 @@ internal sealed class MainMenuState : GameState
             {
                 X = 0,
                 Y = 0,
-                W = 1,
-                H = 1,
+                W = _testTexture.Width,
+                H = _testTexture.Height,
             },
             new SDL.FRect()
             {
                 X = 0,
                 Y = 0,
-                W = 1,
-                H = 1,
+                W = Program.GAME_WIDTH,
+                H = Program.GAME_HEIGHT,
             }
         );
         /*
