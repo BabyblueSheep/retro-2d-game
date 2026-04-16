@@ -11,9 +11,9 @@ internal sealed class Renderer : IDisposable
 
     public bool IsDisposed { get; private set; }
 
-    public Renderer(Window window)
+    public Renderer(Window window, string? name)
     {
-        Handle = SDL.CreateRenderer(window.Handle, null);
+        Handle = SDL.CreateRenderer(window.Handle, name);
 
 
         if (Handle == nint.Zero)

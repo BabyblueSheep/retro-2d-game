@@ -32,13 +32,40 @@ internal sealed class Program
 			return;
 		}
 
-        PaletteIndexBitmap.ReadFile("resources\\sprites.ptid", 0, 0, 1, 1);
+        var testBitmap = PaletteIndexBitmap.ReadFile("resources\\sprites.ptid");
+        for (uint h = 0; h < testBitmap.Height; h++)
+        {
+            var row = "";
+            for (uint w = 0; w < testBitmap.Width; w++)
+            {
+                var shade = testBitmap.ReadShade(w, h);
+                var shadeChar = "";
+                switch (shade)
+                {
+                    case 0:
+                        shadeChar = "y";
+                        break;
+                    case 1:
+                        shadeChar = "g";
+                        break;
+                    case 2:
+                        shadeChar = "r";
+                        break;
+                    case 31:
+                        shadeChar = " ";
+                        break;
+                }
+
+                row = $"{row}{shadeChar} ";
+            }
+            SDL.LogInfo(SDL.LogCategory.Application, $"{row}");
+        }
 
         //SDL.LogInfo(SDL.LogCategory.Application, $"VECTOR3 SIZE: {sizeof(Vector3)}");
 
         var windowFlags = SDL.WindowFlags.Resizable;
 		var window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
-        var renderer = new Renderer(window);
+        var renderer = new Renderer(window, "software");
 
         SDL.SetRenderLogicalPresentation(renderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
 
