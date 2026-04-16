@@ -1,6 +1,7 @@
 using Retro2DGame.Content.GameStates;
 using Retro2DGame.Core;
 using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using SDL3;
 
@@ -30,6 +31,8 @@ internal sealed class Program
 			SDL.LogError(SDL.LogCategory.Application, $"Couldn't initialize SDL: {SDL.GetError()}");
 			return;
 		}
+
+        PaletteIndexBitmap.ReadFile("resources\\sprites.ptid", 0, 0, 1, 1);
 
         //SDL.LogInfo(SDL.LogCategory.Application, $"VECTOR3 SIZE: {sizeof(Vector3)}");
 
