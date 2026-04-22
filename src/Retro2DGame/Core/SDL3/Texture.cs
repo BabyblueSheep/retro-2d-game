@@ -38,6 +38,20 @@ internal sealed class Texture : IDisposable
         }
     }
 
+    public SDL.ScaleMode ScaleMode
+    {
+        get
+        {
+            SDL.GetTextureScaleMode(Handle, out var scaleMode);
+            return scaleMode;
+        }
+
+        set
+        {
+            SDL.SetTextureScaleMode(Handle, value);
+        }
+    }
+
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }

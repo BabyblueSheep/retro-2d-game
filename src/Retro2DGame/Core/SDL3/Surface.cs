@@ -1,6 +1,8 @@
 ﻿using SDL3;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace Retro2DGame.Core.SDL3;
@@ -36,6 +38,18 @@ internal sealed class Surface : IDisposable
     private Surface(nint handle)
     {
         Handle = handle;
+    }
+
+    public static Surface Create(int width, int height, SDL.PixelFormat pixelFormat)
+    {
+        var handle = SDL.CreateSurface(width, height, pixelFormat);
+        if (handle == nint.Zero)
+        {
+            throw new Exception($"Couldn't load PNG: {SDL.GetError()}");
+        }
+
+        var surface = new Surface(handle);
+        return surface;
     }
 
     public static Surface LoadPNG(string filepath)

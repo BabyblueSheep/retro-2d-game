@@ -32,44 +32,13 @@ internal sealed class Program
 			return;
 		}
 
-        var testBitmap = PaletteIndexBitmap.ReadFile("resources\\sprites.ptid");
-        for (uint h = 0; h < testBitmap.Height; h++)
-        {
-            var row = "";
-            for (uint w = 0; w < testBitmap.Width; w++)
-            {
-                var shade = testBitmap.ReadShade(w, h);
-                var shadeChar = "";
-                switch (shade)
-                {
-                    case 0:
-                        shadeChar = "y";
-                        break;
-                    case 1:
-                        shadeChar = "g";
-                        break;
-                    case 2:
-                        shadeChar = "r";
-                        break;
-                    case 31:
-                        shadeChar = " ";
-                        break;
-                }
-
-                row = $"{row}{shadeChar} ";
-            }
-            SDL.LogInfo(SDL.LogCategory.Application, $"{row}");
-        }
-
-        //SDL.LogInfo(SDL.LogCategory.Application, $"VECTOR3 SIZE: {sizeof(Vector3)}");
-
         var windowFlags = SDL.WindowFlags.Resizable;
 		var window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
-        var renderer = new Renderer(window, "software");
+        var renderer = Renderer.Create(window, "software");
 
         SDL.SetRenderLogicalPresentation(renderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
 
-		const int TICKS_PER_SECOND = 20;
+        const int TICKS_PER_SECOND = 20;
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
 

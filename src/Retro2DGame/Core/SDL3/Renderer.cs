@@ -1,6 +1,7 @@
 ﻿using SDL3;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Retro2DGame.Core.SDL3;
@@ -11,15 +12,35 @@ internal sealed class Renderer : IDisposable
 
     public bool IsDisposed { get; private set; }
 
-    public Renderer(Window window, string? name)
+    private Renderer(nint handle)
     {
-        Handle = SDL.CreateRenderer(window.Handle, name);
+        Handle = handle;
+    }
 
+    public static Renderer Create(Window window, string? name)
+    {
+        var handle = SDL.CreateRenderer(window.Handle, name);
 
-        if (Handle == nint.Zero)
+        if (handle == nint.Zero)
         {
             throw new Exception($"Couldn't create renderer: {SDL.GetError()}");
         }
+
+        var renderer = new Renderer(handle);
+        return renderer;
+    }
+
+    public static Renderer CreateSoftware(Surface surface)
+    {
+        var handle = SDL.CreateSoftwareRenderer(surface.Handle);
+
+        if (handle == nint.Zero)
+        {
+            throw new Exception($"Couldn't create renderer: {SDL.GetError()}");
+        }
+
+        var renderer = new Renderer(handle);
+        return renderer;
     }
 
     public bool Clear()
@@ -33,9 +54,21 @@ internal sealed class Renderer : IDisposable
     }
     public bool SetDrawColorFloat(SDL.FColor color) => SetDrawColorFloat(color.R, color.G, color.B, color.A);
 
+    public bool SetDrawColor(byte r, byte g, byte b, byte a)
+    {
+        return SDL.SetRenderDrawColor(Handle, r, g, b, a);
+    }
+    public bool SetDrawColor(SDL.Color color) => SetDrawColor(color.R, color.G, color.B, color.A);
+    public bool SetDrawColor(Color color) => SetDrawColor(color.R, color.G, color.B, color.A);
+
     public bool Present()
     {
         return SDL.RenderPresent(Handle);
+    }
+
+    public bool RenderPoint(int x, int y)
+    {
+        return SDL.RenderPoint(Handle, x, y);
     }
 
     public bool RenderTexture(Texture texture, SDL.FRect sourceRectangle, SDL.FRect destinationRectangle)

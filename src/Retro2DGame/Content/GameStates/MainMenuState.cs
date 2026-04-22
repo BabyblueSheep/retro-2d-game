@@ -1,4 +1,5 @@
 using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
@@ -10,13 +11,27 @@ internal sealed class MainMenuState : GameState
 {
     private Texture _testTexture;
 
+
     private int _selectedOption;
 
     public MainMenuState(Renderer renderer, GameEngine engine) : base(engine)
     {
-        var pngSurface = Surface.LoadPNG("resources/shoe.png");
-        _testTexture = Texture.CreateFromSurface(renderer, pngSurface);
-        pngSurface.Dispose();
+        var testBitmap = PaletteIndexBitmap.CreateFromFile("resources\\sprites.ptid");
+
+        var testSurface = Surface.Create((int)testBitmap.Width, (int)testBitmap.Height, SDL.PixelFormat.RGBA8888);
+        var testRenderer = Renderer.CreateSoftware(testSurface);
+
+        testRenderer.BlitPaletteIndexBitmap(testBitmap, 0, 0, new Color[,]
+        {
+            { Color.Yellow },
+            { Color.Green },
+            { Color.Red }
+        });
+
+        testRenderer.Present();
+
+        _testTexture = Texture.CreateFromSurface(renderer, testSurface);
+        _testTexture.ScaleMode = SDL.ScaleMode.PixelArt;
     }
 
     public override void Update(TimeSpan delta)
@@ -79,8 +94,8 @@ internal sealed class MainMenuState : GameState
             {
                 X = 0,
                 Y = 0,
-                W = Program.GAME_WIDTH,
-                H = Program.GAME_HEIGHT,
+                W = _testTexture.Width,
+                H = _testTexture.Height,
             }
         );
         /*
