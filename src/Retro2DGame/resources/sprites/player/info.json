@@ -1,0 +1,10 @@
+{
+	"sprites": [
+		"sprites/player_idle.png",
+		
+		"sprites/player_walk_1.png",
+		"sprites/player_walk_2.png",
+		"sprites/player_walk_3.png"
+	],
+	"palette": "palette.png",
+}

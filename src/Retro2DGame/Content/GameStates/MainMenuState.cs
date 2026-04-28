@@ -16,13 +16,14 @@ internal sealed class MainMenuState : GameState
 
     public MainMenuState(Renderer renderer, GameEngine engine) : base(engine)
     {
-        var testBitmap = PaletteIndexBitmap.CreateFromFile("resources\\sprites.ptid");
+        var testBitmap = PaletteIndexBitmap.CreateFromFile("resources\\player.ptid");
 
         var testSurface = Surface.Create((int)testBitmap.Width, (int)testBitmap.Height, SDL.PixelFormat.RGBA8888);
         var testRenderer = Renderer.CreateSoftware(testSurface);
 
         testRenderer.BlitPaletteIndexBitmap(testBitmap, 0, 0, new Color[,]
         {
+            { Color.Transparent },
             { Color.Yellow },
             { Color.Green },
             { Color.Red }

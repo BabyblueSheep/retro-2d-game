@@ -12,7 +12,7 @@ internal sealed class PaletteIndexBitmap
     public const byte SHADE_BITS_MASK = (1 << SHADE_LENGTH_BITS) - 1;
     public const byte CONTEXT_BITS_MASK = ((1 << CONTEXT_LENGTH_BITS) - 1) << SHADE_LENGTH_BITS;
 
-    public const int TRANSPARENCY_SHADE = 31;
+    public const int TRANSPARENCY_SHADE = 0;
 
     public uint Width { get; }
     public uint Height { get; }

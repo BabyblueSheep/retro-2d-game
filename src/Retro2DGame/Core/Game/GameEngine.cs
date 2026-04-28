@@ -17,6 +17,7 @@ internal sealed class GameEngine : IDisposable
 
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
+    public AssetKeeper AssetKeeper { get; }
 
     public bool HasRequestedToDie { get; private set; }
 
@@ -36,6 +37,7 @@ internal sealed class GameEngine : IDisposable
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
+        AssetKeeper = new AssetKeeper();
     }
 
     public void Start()
