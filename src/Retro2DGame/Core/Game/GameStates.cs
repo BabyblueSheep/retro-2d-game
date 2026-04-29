@@ -1,4 +1,5 @@
-﻿using Retro2DGame.Core.SDL3;
+﻿using Retro2DGame.Core.Game.Rendering;
+using Retro2DGame.Core.SDL3;
 
 namespace Retro2DGame.Core.Game;
 
@@ -16,7 +17,7 @@ internal abstract class GameState : IDisposable
     public abstract void Update(TimeSpan delta);
     public abstract void FixedUpdate(TimeSpan delta);
 
-    public abstract void Render(double progress, Window window, Renderer renderer);
+    public abstract void Render(double progress, PaletteIndexBitmap presentingBitmap);
 
     protected abstract void Dispose(bool disposing);
 

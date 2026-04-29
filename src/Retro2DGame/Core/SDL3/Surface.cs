@@ -45,7 +45,19 @@ internal sealed class Surface : IDisposable
         var handle = SDL.CreateSurface(width, height, pixelFormat);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't load PNG: {SDL.GetError()}");
+            throw new Exception($"Couldn't create surface: {SDL.GetError()}");
+        }
+
+        var surface = new Surface(handle);
+        return surface;
+    }
+
+    public static Surface GetFromWindow(Window window)
+    {
+        var handle = SDL.GetWindowSurface(window.Handle);
+        if (handle == nint.Zero)
+        {
+            throw new Exception($"Couldn't create surface: {SDL.GetError()}");
         }
 
         var surface = new Surface(handle);

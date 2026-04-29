@@ -1,4 +1,5 @@
-﻿using Retro2DGame.Core.SDL3;
+﻿using Retro2DGame.Core.Game.Rendering;
+using Retro2DGame.Core.SDL3;
 using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
 using System.Diagnostics;
@@ -14,6 +15,10 @@ internal sealed class GameEngine : IDisposable
 
     private readonly TimeSpan _tickDuration;
     private readonly int _maxUpdateAmountPerTick;
+
+    private readonly PaletteIndexBitmap _presentingBitmap;
+    private readonly Surface _presentingSurface;
+    private readonly Renderer _presentingRenderer;
 
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
@@ -34,6 +39,10 @@ internal sealed class GameEngine : IDisposable
 
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
+
+        _presentingBitmap = PaletteIndexBitmap.CreateEmpty(Program.GAME_WIDTH, Program.GAME_HEIGHT);
+        _presentingSurface = Surface.Create((int)_presentingBitmap.Width, (int)_presentingBitmap.Height, SDL.PixelFormat.RGBA8888);
+        _presentingRenderer = Renderer.CreateSoftware(_presentingSurface);
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
@@ -92,8 +101,7 @@ internal sealed class GameEngine : IDisposable
 
         var frameProgress = _accumulatedTime / _tickDuration;
 
-        renderer.SetDrawColorFloat(Color.Black.ToFColor());
-        renderer.Clear();
+        _presentingBitmap.Clear();
 
         var currentGameStatesCopy = GameStates.Copy();
         foreach (var state in currentGameStatesCopy)
@@ -105,13 +113,55 @@ internal sealed class GameEngine : IDisposable
                 state.FixedUpdate(_tickDuration);
             }
 
-            state.Render(frameProgress, window, renderer);
+            state.Render(frameProgress, _presentingBitmap);
         }
 
-        renderer.Present();
+        PresentBitmap(window, renderer);
     }
 
+    private void PresentBitmap(Window window, Renderer windowRenderer)
+    {
+        windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        windowRenderer.Clear();
 
+        _presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        _presentingRenderer.Clear();
+
+        windowRenderer.BlitPaletteIndexBitmap(_presentingBitmap, 0, 0, new Color[,]
+        {
+            { Color.Transparent },
+            { Color.Red },
+            { Color.Green },
+            { Color.Yellow }
+        });
+        windowRenderer.Present();
+
+
+        /*var presentingTexture = Texture.CreateFromSurface(windowRenderer, _presentingSurface);
+        presentingTexture.ScaleMode = SDL.ScaleMode.PixelArt;
+
+        windowRenderer.RenderTexture(
+            presentingTexture,
+            new SDL.FRect()
+            {
+                X = 0,
+                Y = 0,
+                W = presentingTexture.Width,
+                H = presentingTexture.Height,
+            },
+            new SDL.FRect()
+            {
+                X = 0,
+                Y = 0,
+                W = window.Width,
+                H = window.Height,
+            }
+        );
+
+        windowRenderer.Present();
+
+        presentingTexture.Dispose();*/
+    }
 
     public void RequestToDie()
     {
@@ -128,6 +178,9 @@ internal sealed class GameEngine : IDisposable
             {
                 
             }
+
+            _presentingRenderer.Dispose();
+            _presentingSurface.Dispose();
 
             IsDisposed = true;
         }

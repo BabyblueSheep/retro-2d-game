@@ -96,17 +96,17 @@ internal sealed class PaletteIndexBitmap
     public void Blit
     (
         PaletteIndexBitmap destination,
-        uint sourcePositionX, uint sourcePositionY,
+        //uint sourcePositionX, uint sourcePositionY,
         uint destinationPositionX, uint destinationPositionY,
-        uint width, uint height,
+        //uint width, uint height,
         bool ignoreTransparency = true
     )
     {
-        for (uint h = 0; h < height; h++)
+        for (uint h = 0; h < Width; h++)
         {
-            for (uint w = 0; w < width; w++)
+            for (uint w = 0; w < Height; w++)
             {
-                var indexToCopy = ReadIndex(sourcePositionX + w, sourcePositionY + h);
+                var indexToCopy = ReadIndex(w, h);
                 if (((indexToCopy & SHADE_BITS_MASK) == TRANSPARENCY_SHADE) && ignoreTransparency)
                     continue;
 
@@ -115,9 +115,9 @@ internal sealed class PaletteIndexBitmap
         }
     }
 
-    public void SwapShades(params (byte, byte)[] shadeConversions)
+    public void Clear()
     {
-        
+        Array.Clear(_paletteIndexes, 0, _paletteIndexes.Length);
     }
 }
 

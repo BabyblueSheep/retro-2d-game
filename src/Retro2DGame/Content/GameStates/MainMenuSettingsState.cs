@@ -1,4 +1,5 @@
 ﻿using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using SDL3;
 using System;
@@ -67,7 +68,7 @@ internal class MainMenuSettingsState : GameState
 
     }
 
-    public override void Render(double progress, Window window, Renderer renderer)
+    public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
     {
         /*
         if (_selectedOption == 0)

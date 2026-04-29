@@ -9,30 +9,11 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
-    private Texture _testTexture;
-
-
     private int _selectedOption;
 
-    public MainMenuState(Renderer renderer, GameEngine engine) : base(engine)
+    public MainMenuState(GameEngine engine) : base(engine)
     {
-        var testBitmap = PaletteIndexBitmap.CreateFromFile("resources\\player.ptid");
 
-        var testSurface = Surface.Create((int)testBitmap.Width, (int)testBitmap.Height, SDL.PixelFormat.RGBA8888);
-        var testRenderer = Renderer.CreateSoftware(testSurface);
-
-        testRenderer.BlitPaletteIndexBitmap(testBitmap, 0, 0, new Color[,]
-        {
-            { Color.Transparent },
-            { Color.Yellow },
-            { Color.Green },
-            { Color.Red }
-        });
-
-        testRenderer.Present();
-
-        _testTexture = Texture.CreateFromSurface(renderer, testSurface);
-        _testTexture.ScaleMode = SDL.ScaleMode.PixelArt;
     }
 
     public override void Update(TimeSpan delta)
@@ -77,65 +58,9 @@ internal sealed class MainMenuState : GameState
 
     }
 
-    public override void Render(double progress, Window window, Renderer renderer)
+    public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
     {
-        renderer.SetDrawColorFloat(Color.Black.ToFColor());
-        renderer.Clear();
-
-        renderer.RenderTexture(
-            _testTexture,
-            new SDL.FRect()
-            {
-                X = 0,
-                Y = 0,
-                W = _testTexture.Width,
-                H = _testTexture.Height,
-            },
-            new SDL.FRect()
-            {
-                X = 0,
-                Y = 0,
-                W = _testTexture.Width,
-                H = _testTexture.Height,
-            }
-        );
-        /*
-        SDL.SetRenderDrawColorFloat(renderer, 0f, 0f, 0f, SDL.AlphaOpaqueFloat);
-        SDL.RenderClear(renderer);
-
-        SDL.SetRenderDrawColorFloat(renderer, 1f, 0f, 0f, SDL.AlphaOpaqueFloat);
-        SDL.RenderRect(renderer, new SDL.FRect()
-        {
-            X = 0,
-            Y = 0,
-            W = Program.GAME_WIDTH,
-            H = Program.GAME_HEIGHT
-        });
-
-        if (ReferenceEquals(this, GameEngine.GameStates.Peek()))
-        {
-            SDL.SetRenderDrawColorFloat(renderer, 1f, 0f, 0f, SDL.AlphaOpaqueFloat);
-            SDL.SetRenderScale(renderer, 2f, 2f);
-            SDL.RenderDebugText(renderer, 5, 5, "Game");
-
-            SDL.SetRenderScale(renderer, 1f, 1f);
-            if (_selectedOption == 0)
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 1f, 1f, SDL.AlphaOpaqueFloat);
-            else
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 0f, 0f, SDL.AlphaOpaqueFloat);
-            SDL.RenderDebugText(renderer, 15, 50, "Start");
-            if (_selectedOption == 1)
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 1f, 1f, SDL.AlphaOpaqueFloat);
-            else
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 0f, 0f, SDL.AlphaOpaqueFloat);
-            SDL.RenderDebugText(renderer, 15, 60, "Options");
-            if (_selectedOption == 2)
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 1f, 1f, SDL.AlphaOpaqueFloat);
-            else
-                SDL.SetRenderDrawColorFloat(renderer, 1f, 0f, 0f, SDL.AlphaOpaqueFloat);
-            SDL.RenderDebugText(renderer, 15, 70, "End");
-        }
-        */
+        GameEngine.AssetKeeper.RequestBitmap("player_idle").Blit(presentingBitmap, 5, 5);
     }
 
     protected override void Dispose(bool disposing)
@@ -146,8 +71,6 @@ internal sealed class MainMenuState : GameState
             {
 
             }
-
-            _testTexture.Dispose();
 
             IsDisposed = true;
         }

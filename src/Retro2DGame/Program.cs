@@ -34,7 +34,8 @@ internal sealed class Program
 
         var windowFlags = SDL.WindowFlags.Resizable;
 		var window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
-        var renderer = Renderer.Create(window, "software");
+        var surface = Surface.GetFromWindow(window);
+        var renderer = Renderer.CreateSoftware(surface);
 
         SDL.SetRenderLogicalPresentation(renderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
 
@@ -42,9 +43,9 @@ internal sealed class Program
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
 
-        gameEngine.AssetKeeper.AddBitmap()
+        LoadAssets(gameEngine);
 
-        gameEngine.GameStates.Push(new MainMenuState(renderer, gameEngine));
+        gameEngine.GameStates.Push(new MainMenuState(gameEngine));
 
         gameEngine.Start();
         while (!gameEngine.HasRequestedToDie)
@@ -59,6 +60,23 @@ internal sealed class Program
         window.Dispose();
 
 		SDL.Quit();
+    }
+
+    private static void LoadAssets(GameEngine gameEngine)
+    {
+        string[] playerSpriteNames = [
+            "player_idle",
+
+            "player_walk_1",
+            "player_walk_2",
+            "player_walk_3",
+        ];
+
+        foreach (var spriteName in playerSpriteNames)
+        {
+            var bitmap = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\{spriteName}.ptid");
+            gameEngine.AssetKeeper.AddBitmap(spriteName, bitmap);
+        }
     }
 }
 

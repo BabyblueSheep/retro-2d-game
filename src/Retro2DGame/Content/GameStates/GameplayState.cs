@@ -1,4 +1,5 @@
 ﻿using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ internal sealed class GameplayState : GameState
         
     }
 
-    public override void Render(double progress, Window window, Renderer renderer)
+    public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
     {
         
     }
