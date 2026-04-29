@@ -76,6 +76,50 @@ internal sealed class Surface : IDisposable
         return surface;
     }
 
+    public static Surface LockTexture(Texture texture, nint rectangle)
+    {
+        var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
+        if (!result || handle == nint.Zero)
+        {
+            throw new Exception($"Couldn't lock texture: {SDL.GetError()}");
+        }
+
+        var surface = new Surface(handle);
+        return surface;
+    }
+
+    public static Surface LockTexture(Texture texture, SDL.Rect rectangle)
+    {
+        var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
+        if (!result || handle == nint.Zero)
+        {
+            throw new Exception($"Couldn't lock texture: {SDL.GetError()}");
+        }
+
+        var surface = new Surface(handle);
+        return surface;
+    }
+
+    public bool BlitSurface(Surface destination, nint sourceRectangle, nint destinationRectangle)
+    {
+        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+    }
+
+    public bool BlitSurface(Surface destination, nint sourceRectangle, SDL.Rect destinationRectangle)
+    {
+        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+    }
+
+    public bool BlitSurface(Surface destination, SDL.Rect sourceRectangle, nint destinationRectangle)
+    {
+        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+    }
+
+    public bool BlitSurface(Surface destination, SDL.Rect sourceRectangle, SDL.Rect destinationRectangle)
+    {
+        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+    }
+
     private void Dispose(bool disposing)
     {
         if (!IsDisposed)

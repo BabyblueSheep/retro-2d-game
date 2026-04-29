@@ -9,12 +9,6 @@ namespace Retro2DGame;
 
 internal sealed class Program
 {
-	public const int DEFAULT_WINDOW_WIDTH = 640;
-	public const int DEFAULT_WINDOW_HEIGHT = 480;
-
-	public const int GAME_WIDTH = 256;
-	public const int GAME_HEIGHT = 256;
-
     static void Main(string[] args)
 	{
 		SDL.SetAppMetadataProperty(SDL.Props.AppMetadataNameString, "Game");
@@ -32,13 +26,6 @@ internal sealed class Program
 			return;
 		}
 
-        var windowFlags = SDL.WindowFlags.Resizable;
-		var window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
-        var surface = Surface.GetFromWindow(window);
-        var renderer = Renderer.CreateSoftware(surface);
-
-        SDL.SetRenderLogicalPresentation(renderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
-
         const int TICKS_PER_SECOND = 20;
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
@@ -50,14 +37,11 @@ internal sealed class Program
         gameEngine.Start();
         while (!gameEngine.HasRequestedToDie)
 		{
-			gameEngine.Run(window, renderer);
+			gameEngine.Run();
         }
 		gameEngine.Stop();
 
 		gameEngine.Dispose();
-
-        renderer.Dispose();
-        window.Dispose();
 
 		SDL.Quit();
     }

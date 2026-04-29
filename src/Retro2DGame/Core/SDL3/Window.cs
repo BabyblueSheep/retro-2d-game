@@ -26,6 +26,11 @@ internal sealed class Window : IDisposable
         }
     }
 
+    public SDL.PixelFormat PixelFormat
+    {
+        get => SDL.GetWindowPixelFormat(Handle);
+    }
+
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }
@@ -38,6 +43,11 @@ internal sealed class Window : IDisposable
         {
             throw new Exception($"Couldn't create window: {SDL.GetError()}");
         }
+    }
+
+    public bool UpdateWindowSurface()
+    {
+        return SDL.UpdateWindowSurface(Handle);
     }
 
     private void Dispose(bool disposing)
