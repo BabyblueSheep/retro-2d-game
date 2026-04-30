@@ -4,6 +4,7 @@ using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using SDL3;
+using System.Drawing;
 
 namespace Retro2DGame;
 
@@ -61,6 +62,12 @@ internal sealed class Program
             var bitmap = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\{spriteName}.ptid");
             gameEngine.AssetKeeper.AddBitmap(spriteName, bitmap);
         }
+
+        gameEngine.Palette[0, 0] = Color.Transparent;
+        gameEngine.Palette[1, 0] = Color.Red;
+        gameEngine.Palette[2, 0] = Color.Green;
+        gameEngine.Palette[3, 0] = Color.Yellow;
+
     }
 }
 

@@ -9,15 +9,19 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
+    private TimeSpan _testTimer;
+
     private int _selectedOption;
 
     public MainMenuState(GameEngine engine) : base(engine)
     {
-
+        _testTimer = TimeSpan.Zero;
     }
 
     public override void Update(TimeSpan delta)
     {
+        _testTimer += delta;
+
         if (!ReferenceEquals(this, GameEngine.GameStates.Peek()))
             return;
 
@@ -60,7 +64,7 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
     {
-        GameEngine.AssetKeeper.RequestBitmap("player_idle").Blit(presentingBitmap, 5, 5);
+        GameEngine.AssetKeeper.RequestBitmap($"player_walk_{1 + (int)(_testTimer.TotalSeconds * 6) % 3}").Blit(presentingBitmap, 5, 5);
     }
 
     protected override void Dispose(bool disposing)

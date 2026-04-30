@@ -34,7 +34,7 @@ internal sealed class GameEngine : IDisposable
     public GameStateStack GameStates { get; }
     public AssetKeeper AssetKeeper { get; }
 
-    public Palette Palette { get; private set; }
+    public Palette Palette { get; }
 
     public Window Window { get; }
 
@@ -69,11 +69,6 @@ internal sealed class GameEngine : IDisposable
         AssetKeeper = new AssetKeeper();
 
         Palette = new Palette();
-
-        Palette[0, 0] = Color.Transparent;
-        Palette[1, 0] = Color.Red;
-        Palette[2, 0] = Color.Green;
-        Palette[3, 0] = Color.Yellow;
 
     }
 
