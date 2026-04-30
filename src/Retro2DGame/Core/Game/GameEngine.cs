@@ -23,8 +23,9 @@ internal sealed class GameEngine : IDisposable
     private readonly int _maxUpdateAmountPerTick;
 
     private readonly PaletteIndexBitmap _presentingBitmap;
+    private Surface _presentingSurface;
+    private Renderer _presentingRenderer;
 
-    private Surface _windowSurface;
     private Renderer _windowRenderer;
     private Texture _windowTexture;
 
@@ -32,6 +33,8 @@ internal sealed class GameEngine : IDisposable
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
     public AssetKeeper AssetKeeper { get; }
+
+    public Palette Palette { get; private set; }
 
     public Window Window { get; }
 
@@ -47,7 +50,8 @@ internal sealed class GameEngine : IDisposable
         var windowFlags = SDL.WindowFlags.Resizable;
         Window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
         _windowRenderer = Renderer.Create(Window, "software");
-        _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, Window.Width, Window.Height);
+        _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
+        _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
 
         _timeTracker = new Stopwatch();
         _previousElapsedTime = _timeTracker.Elapsed;
@@ -57,10 +61,20 @@ internal sealed class GameEngine : IDisposable
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
 
         _presentingBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
+        _presentingSurface = Surface.Create(GAME_WIDTH, GAME_HEIGHT, Window.PixelFormat);
+        _presentingRenderer = Renderer.CreateSoftware(_presentingSurface);
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
         AssetKeeper = new AssetKeeper();
+
+        Palette = new Palette();
+
+        Palette[0, 0] = Color.Transparent;
+        Palette[1, 0] = Color.Red;
+        Palette[2, 0] = Color.Green;
+        Palette[3, 0] = Color.Yellow;
+
     }
 
     public void Start()
@@ -93,9 +107,9 @@ internal sealed class GameEngine : IDisposable
             {
                 _windowRenderer.Dispose();
 
-                _windowSurface = Surface.GetFromWindow(Window);
-                _windowRenderer = Renderer.CreateSoftware(_windowSurface);
-                _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, Window.Width, Window.Height);
+                _windowRenderer = Renderer.Create(Window, "software");
+                _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
+                _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
 
                 _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
                 _windowRenderer.Clear();
@@ -149,54 +163,23 @@ internal sealed class GameEngine : IDisposable
 
     private void PresentBitmap()
     {
-        _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
-        _windowRenderer.Clear();
-
-        SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
-
-        /*
         _presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
         _presentingRenderer.Clear();
 
-        //SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
+        _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        _windowRenderer.Clear();
+        SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
 
-        /*_presentingRenderer.BlitPaletteIndexBitmap(_presentingBitmap, 0, 0, new Color[,]
-        {
-            { Color.Transparent },
-            { Color.Red },
-            { Color.Green },
-            { Color.Yellow }
-        });
-
-        var t = _presentingRenderer.SetDrawColorFloat(Color.Red.ToFColor());
-        SDL.RenderFillRect(_presentingRenderer.Handle, new SDL.FRect() { X = 0, Y = 0, W = 200, H = 200 });
-
+        _presentingRenderer.BlitPaletteIndexBitmap(_presentingBitmap, 0, 0, Palette);
         _presentingRenderer.Present();
 
-        _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
-        SDL.RenderRect(_windowRenderer.Handle, new SDL.FRect() { X = 0, Y = 0, W = 100, H = 100 });
+        var windowTextureSurface = Surface.LockTexture(_windowTexture, nint.Zero);
 
-        _presentingSurface.BlitSurface(_windowSurface, nint.Zero, nint.Zero);*/
-
-        _windowTexture.Lock(nint.Zero, out nint pixelsHandle, out int pitch);
-        var pixelCount = (pitch / 4) * GAME_HEIGHT;
-        var pixels = SDL.PointerToStructureArray<int>(pixelsHandle, pixelCount);
-        if (pixels == null)
-        {
-            throw new Exception("Pixels is null!");
-        }
-
-        for (int y = 0; y < GAME_HEIGHT; y++)
-        {
-            for (int x = 0; x < pitch / 4; x++)
-            {
-                pixels[x + (y * GAME_HEIGHT)] = (255 << 24) | (255 << 16) | (255 << 8) | (255 << 0);
-            }
-        }
+        _presentingSurface.BlitSurface(windowTextureSurface, new SDL.Rect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
         _windowTexture.Unlock();
 
-        SDL.RenderTexture(_windowRenderer.Handle, _windowTexture.Handle, new SDL.FRect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_WIDTH }, nint.Zero);
+        _windowRenderer.RenderTexture(_windowTexture, new SDL.FRect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
         _windowRenderer.Present();
     }
@@ -217,6 +200,8 @@ internal sealed class GameEngine : IDisposable
                 
             }
 
+            _presentingSurface.Dispose();
+            _presentingRenderer.Dispose();
 
             _windowRenderer.Dispose();
             Window.Dispose();

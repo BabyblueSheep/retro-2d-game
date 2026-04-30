@@ -71,6 +71,21 @@ internal sealed class Renderer : IDisposable
         return SDL.RenderPoint(Handle, x, y);
     }
 
+    public bool RenderTexture(Texture texture, nint sourceRectangle, nint destinationRectangle)
+    {
+        return SDL.RenderTexture(Handle, texture.Handle, sourceRectangle, destinationRectangle);
+    }
+
+    public bool RenderTexture(Texture texture, SDL.FRect sourceRectangle, nint destinationRectangle)
+    {
+        return SDL.RenderTexture(Handle, texture.Handle, sourceRectangle, destinationRectangle);
+    }
+
+    public bool RenderTexture(Texture texture, nint sourceRectangle, SDL.FRect destinationRectangle)
+    {
+        return SDL.RenderTexture(Handle, texture.Handle, sourceRectangle, destinationRectangle);
+    }
+
     public bool RenderTexture(Texture texture, SDL.FRect sourceRectangle, SDL.FRect destinationRectangle)
     {
         return SDL.RenderTexture(Handle, texture.Handle, sourceRectangle, destinationRectangle);

@@ -127,7 +127,7 @@ internal static class RendererBitmapExtension
     (
         this Renderer renderer, PaletteIndexBitmap bitmap,
         int destinationX, int destinationY,
-        Color[,] palettes,
+        Palette palette,
         bool ignoreTransparency = true
     )
     {
@@ -141,7 +141,7 @@ internal static class RendererBitmapExtension
 
                 var context = bitmap.ReadContext(w, h);
 
-                renderer.SetDrawColor(palettes[shade, context]);
+                renderer.SetDrawColor(palette[shade, context]);
                 renderer.RenderPoint((int)(destinationX + w), (int)(destinationY + h));
             }
         }
