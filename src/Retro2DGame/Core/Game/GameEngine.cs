@@ -98,26 +98,33 @@ internal sealed class GameEngine : IDisposable
         Inputs.Propagate();
         while (SDL.PollEvent(out var @event))
         {
-            if ((SDL.EventType)@event.Type == SDL.EventType.WindowPixelSizeChanged)
+            switch ((SDL.EventType)@event.Type)
             {
-                _windowRenderer.Dispose();
+                case SDL.EventType.WindowPixelSizeChanged:
+                    _windowRenderer.Dispose();
 
-                _windowRenderer = Renderer.Create(Window, "software");
-                _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
-                _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
+                    _windowRenderer = Renderer.Create(Window, "software");
+                    _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
+                    _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
 
-                _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
-                _windowRenderer.Clear();
-            }
+                    _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+                    _windowRenderer.Clear();
+                    break;
 
-            if ((SDL.EventType)@event.Type == SDL.EventType.KeyDown || (SDL.EventType)@event.Type == SDL.EventType.KeyUp)
-            {
-                Inputs.UpdateEvent(@event);
-            }
+                case SDL.EventType.KeyDown:
+                case SDL.EventType.KeyUp:
+                case SDL.EventType.MouseMotion:
+                case SDL.EventType.MouseButtonDown:
+                case SDL.EventType.MouseButtonUp:
+                    Inputs.UpdateEvent(@event);
+                    break;
+                    
+                case SDL.EventType.Quit:
+                    RequestToDie();
+                    break;
+                default:
+                    break;
 
-            if ((SDL.EventType)@event.Type == SDL.EventType.Quit)
-            {
-                RequestToDie();
             }
         }
 

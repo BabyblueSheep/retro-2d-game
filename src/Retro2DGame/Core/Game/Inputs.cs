@@ -1,4 +1,5 @@
 ﻿using SDL3;
+using System.Numerics;
 
 namespace Retro2DGame.Core.Game;
 
@@ -31,6 +32,11 @@ internal enum InputButtonType
 
 internal sealed class Inputs
 {
+    private Vector2 _mousePosition;
+    public Vector2 MousePosition => _mousePosition;
+    public bool IsMouseDown { get; private set; }
+    public bool WasMouseDown { get; private set; }
+
     private readonly Dictionary<InputButtonType, (HashSet<SDL.Scancode>, InputButtonState)> _buttonStates;
 
     public Inputs()
@@ -75,33 +81,40 @@ internal sealed class Inputs
 
     public void UpdateEvent(SDL.Event @event)
     {
-        if (@event.Key.Type == SDL.EventType.KeyDown)
+        switch (@event.Key.Type)
         {
-            foreach (var inputButtonType in _buttonStates.Keys)
-            {
-                var buttonState = _buttonStates[inputButtonType];
-
-                if (buttonState.Item1.Contains(@event.Key.Scancode))
+            case SDL.EventType.KeyDown:
+            case SDL.EventType.KeyUp:
+                var isDown = (SDL.EventType)@event.Type == SDL.EventType.KeyDown;
+                foreach (var inputButtonType in _buttonStates.Keys)
                 {
-                    buttonState.Item2 = buttonState.Item2.Update(true);
+                    var buttonState = _buttonStates[inputButtonType];
+
+                    if (buttonState.Item1.Contains(@event.Key.Scancode))
+                    {
+                        buttonState.Item2 = buttonState.Item2.Update(isDown);
+                    }
+
+                    _buttonStates[inputButtonType] = buttonState;
                 }
+                break;
 
-                _buttonStates[inputButtonType] = buttonState;
-            }
-        }
-        else if (@event.Key.Type == SDL.EventType.KeyUp)
-        {
-            foreach (var inputButtonType in _buttonStates.Keys)
-            {
-                var buttonState = _buttonStates[inputButtonType];
+            case SDL.EventType.MouseMotion:
+                _mousePosition.X = @event.Motion.X;
+                _mousePosition.Y = @event.Motion.Y;
+                break;
 
-                if (buttonState.Item1.Contains(@event.Key.Scancode))
-                {
-                    buttonState.Item2 = buttonState.Item2.Update(false);
-                }
+            case SDL.EventType.MouseButtonDown:
+                WasMouseDown = IsMouseDown;
+                IsMouseDown = true;
+                break;
+            case SDL.EventType.MouseButtonUp:
+                WasMouseDown = IsMouseDown;
+                IsMouseDown = false;
+                break;
 
-                _buttonStates[inputButtonType] = buttonState;
-            }
+            default:
+                break;
         }
     }
 
