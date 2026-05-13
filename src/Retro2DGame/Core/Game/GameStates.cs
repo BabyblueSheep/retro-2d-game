@@ -17,7 +17,7 @@ internal abstract class GameState : IDisposable
     public abstract void Update(TimeSpan delta);
     public abstract void FixedUpdate(TimeSpan delta);
 
-    public abstract void Render(double progress, PaletteIndexBitmap presentingBitmap);
+    public abstract void Render(double progress);
 
     protected abstract void Dispose(bool disposing);
 

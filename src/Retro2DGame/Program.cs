@@ -63,10 +63,10 @@ internal sealed class Program
             gameEngine.AssetKeeper.AddBitmap(spriteName, bitmap);
         }
 
-        gameEngine.Palette[0, 0] = Color.Transparent;
-        gameEngine.Palette[1, 0] = Color.Red;
-        gameEngine.Palette[2, 0] = Color.Green;
-        gameEngine.Palette[3, 0] = Color.Yellow;
+        gameEngine.ForegroundPalette[0, 0] = Color.Transparent;
+        gameEngine.ForegroundPalette[1, 0] = Color.Red;
+        gameEngine.ForegroundPalette[2, 0] = Color.Green;
+        gameEngine.ForegroundPalette[3, 0] = Color.Yellow;
 
     }
 }

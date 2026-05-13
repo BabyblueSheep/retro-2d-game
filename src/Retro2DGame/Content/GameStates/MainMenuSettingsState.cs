@@ -68,7 +68,7 @@ internal class MainMenuSettingsState : GameState
 
     }
 
-    public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
+    public override void Render(double progress)
     {
         /*
         if (_selectedOption == 0)

@@ -1,5 +1,6 @@
 ﻿using SDL3;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Retro2DGame.Core.Game;
 
@@ -33,7 +34,9 @@ internal enum InputButtonType
 internal sealed class Inputs
 {
     private Vector2 _mousePosition;
+    private Vector2 _previousMousePosition;
     public Vector2 MousePosition => _mousePosition;
+    public Vector2 PreviousMousePosition => _previousMousePosition;
     public bool IsMouseDown { get; private set; }
     public bool WasMouseDown { get; private set; }
 
@@ -100,6 +103,7 @@ internal sealed class Inputs
                 break;
 
             case SDL.EventType.MouseMotion:
+                _previousMousePosition = _mousePosition;
                 _mousePosition.X = @event.Motion.X;
                 _mousePosition.Y = @event.Motion.Y;
                 break;

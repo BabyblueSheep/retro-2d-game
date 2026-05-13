@@ -22,7 +22,6 @@ internal sealed class GameEngine : IDisposable
     private readonly TimeSpan _tickDuration;
     private readonly int _maxUpdateAmountPerTick;
 
-    private readonly PaletteIndexBitmap _presentingBitmap;
     private Surface _presentingSurface;
     private Renderer _presentingRenderer;
 
@@ -34,7 +33,10 @@ internal sealed class GameEngine : IDisposable
     public GameStateStack GameStates { get; }
     public AssetKeeper AssetKeeper { get; }
 
-    public Palette Palette { get; }
+    public Palette BackgroundPalette { get; }
+    public Palette ForegroundPalette { get; }
+    public PaletteIndexBitmap BackgroundBitmap { get; }
+    public PaletteIndexBitmap ForegroundBitmap { get; }
 
     public Window Window { get; }
 
@@ -59,8 +61,6 @@ internal sealed class GameEngine : IDisposable
 
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
-
-        _presentingBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
         _presentingSurface = Surface.Create(GAME_WIDTH, GAME_HEIGHT, Window.PixelFormat);
         _presentingRenderer = Renderer.CreateSoftware(_presentingSurface);
 
@@ -68,7 +68,10 @@ internal sealed class GameEngine : IDisposable
         GameStates = new GameStateStack();
         AssetKeeper = new AssetKeeper();
 
-        Palette = new Palette();
+        BackgroundPalette = new Palette();
+        ForegroundPalette = new Palette(); 
+        BackgroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
+        ForegroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
 
     }
 
@@ -143,7 +146,8 @@ internal sealed class GameEngine : IDisposable
 
         var frameProgress = _accumulatedTime / _tickDuration;
 
-        _presentingBitmap.Clear();
+        BackgroundBitmap.Clear();
+        ForegroundBitmap.Clear();
 
         var currentGameStatesCopy = GameStates.Copy();
         foreach (var state in currentGameStatesCopy)
@@ -155,7 +159,7 @@ internal sealed class GameEngine : IDisposable
                 state.FixedUpdate(_tickDuration);
             }
 
-            state.Render(frameProgress, _presentingBitmap);
+            state.Render(frameProgress);
         }
 
         PresentBitmap();
@@ -172,7 +176,8 @@ internal sealed class GameEngine : IDisposable
         _windowRenderer.Clear();
         SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
 
-        _presentingRenderer.BlitPaletteIndexBitmap(_presentingBitmap, 0, 0, Palette);
+        _presentingRenderer.BlitPaletteIndexBitmap(BackgroundBitmap, 0, 0, BackgroundPalette);
+        _presentingRenderer.BlitPaletteIndexBitmap(ForegroundBitmap, 0, 0, ForegroundPalette);
         _presentingRenderer.Present();
 
         var windowTextureSurface = Surface.LockTexture(_windowTexture, nint.Zero);

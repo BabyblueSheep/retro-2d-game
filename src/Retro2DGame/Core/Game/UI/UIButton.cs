@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Numerics;
 using System.Text;
 
 namespace Retro2DGame.Core.Game.UI;
@@ -14,21 +15,44 @@ internal enum UIButtonState
 
 internal sealed class UIButton
 {
-    private UIButtonState _previousState;
-    public UIButtonState State { get; set; }
+
+    private UIButtonState _state;
+    public UIButtonState PreviousState { get; private set; }
+    public UIButtonState State
+    {
+        get { return _state; }
+        set
+        {
+            var didStateChange = _state != value;
+            _state = value;
+            if (didStateChange)
+            {
+                OnStateChange();
+            }
+        }
+    }
     public RectangleF BoundingBox { get; set; }
 
-    public Action UpdateFunction { get; }
-    public Action RenderFunction { get; }
+    public Action OnStateChange { get; }
 
-    public UIButton(Action updateFunction, Action renderFunction)
+    public UIButton(Action onStateChange)
     {
-        UpdateFunction = updateFunction;
-        RenderFunction = renderFunction;
+        OnStateChange = onStateChange;
     }
 
-    public void ProcessMouse()
+    public void ProcessMouseInputs(Vector2 mousePosition, bool isMouseDown)
     {
-
+        PreviousState = State;
+        if (!BoundingBox.Contains(mousePosition.X, mousePosition.Y))
+        {
+            State = UIButtonState.Idle;
+            return;
+        }
+        if (!isMouseDown)
+        {
+            State = UIButtonState.Highlighted;
+            return;
+        }
+        State = UIButtonState.Pressed;
     }
 }

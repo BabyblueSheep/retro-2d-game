@@ -18,7 +18,7 @@ internal sealed class GameplayState : GameState
         
     }
 
-    public override void Render(double progress, PaletteIndexBitmap presentingBitmap)
+    public override void Render(double progress)
     {
         
     }
