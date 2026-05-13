@@ -72,6 +72,8 @@ internal sealed class Inputs
 
     public void Propagate()
     {
+        WasMouseDown = IsMouseDown;
+        
         foreach (var inputButtonType in _buttonStates.Keys)
         {
             var buttonState = _buttonStates[inputButtonType];
@@ -109,11 +111,9 @@ internal sealed class Inputs
                 break;
 
             case SDL.EventType.MouseButtonDown:
-                WasMouseDown = IsMouseDown;
                 IsMouseDown = true;
                 break;
-            case SDL.EventType.MouseButtonUp:
-                WasMouseDown = IsMouseDown;
+            case SDL.EventType.MouseButtonUp: 
                 IsMouseDown = false;
                 break;
 
