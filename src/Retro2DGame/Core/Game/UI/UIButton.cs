@@ -40,9 +40,13 @@ internal sealed class UIButton
         OnStateChange = onStateChange;
     }
 
-    public void ProcessMouseInputs(Vector2 mousePosition, bool isMouseDown)
+    public void Update()
     {
         PreviousState = State;
+    }
+
+    public void ProcessMouseInputs(Vector2 mousePosition, bool isMouseDown)
+    {
         if (!BoundingBox.Contains(mousePosition.X, mousePosition.Y))
         {
             State = UIButtonState.Idle;

@@ -95,24 +95,55 @@ internal sealed class PaletteIndexBitmap
 
     public void Blit
     (
-        PaletteIndexBitmap destination,
-        //uint sourcePositionX, uint sourcePositionY,
+        PaletteIndexBitmap source,
         uint destinationPositionX, uint destinationPositionY,
-        //uint width, uint height,
+        uint sourcePositionX = 0, uint sourcePositionY = 0,
+        uint width = 0, uint height = 0,
         bool ignoreTransparency = true
     )
     {
-        for (uint h = 0; h < Width; h++)
+        if (width == 0)
+            width = source.Width;
+        if (height == 0)
+            height = source.Height;
+        for (uint h = 0; h < height; h++)
         {
-            for (uint w = 0; w < Height; w++)
+            for (uint w = 0; w < width; w++)
             {
-                var indexToCopy = ReadIndex(w, h);
+                var samplePositionX = sourcePositionX + w;
+                var samplePositionY = sourcePositionY + h;
+
+                if (samplePositionX < 0 || samplePositionX >= source.Width)
+                    continue;
+                if (samplePositionY < 0 || samplePositionY >= source.Height)
+                    continue;
+
+                var indexToCopy = source.ReadIndex(samplePositionX, samplePositionY);
                 if (((indexToCopy & SHADE_BITS_MASK) == TRANSPARENCY_SHADE) && ignoreTransparency)
                     continue;
 
-                destination.WriteIndex(indexToCopy, destinationPositionX + w, destinationPositionY + h);
+                var finalPositionX = destinationPositionX + w;
+                var finalPositionY = destinationPositionY + h;
+
+                if (finalPositionX < 0 || finalPositionX >= Width)
+                    continue;
+                if (finalPositionY < 0 || finalPositionY >= Height)
+                    continue;
+
+                WriteIndex(indexToCopy, finalPositionX, finalPositionY);
             }
         }
+    }
+
+    public void Blit
+    (
+        PaletteIndexBitmap source,
+        uint destinationPositionX, uint destinationPositionY,
+        Rectangle sourceRectangle,
+        bool ignoreTransparency = true
+    )
+    {
+        Blit(source, destinationPositionX, destinationPositionY, (uint)sourceRectangle.X, (uint)sourceRectangle.Y, (uint)sourceRectangle.Width, (uint)sourceRectangle.Height, ignoreTransparency);
     }
 
     public void Clear()

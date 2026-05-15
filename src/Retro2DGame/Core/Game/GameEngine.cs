@@ -4,6 +4,7 @@ using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
 using System.Diagnostics;
 using System.Drawing;
+using System.Numerics;
 
 namespace Retro2DGame.Core.Game;
 
@@ -11,9 +12,11 @@ internal sealed class GameEngine : IDisposable
 {
     public const int DEFAULT_WINDOW_WIDTH = 640;
     public const int DEFAULT_WINDOW_HEIGHT = 480;
+    public readonly Vector2 DEFAULT_WINDOW_SIZE = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
     public const int GAME_WIDTH = 256;
     public const int GAME_HEIGHT = 256;
+    public readonly Vector2 GAME_SIZE = new Vector2(GAME_WIDTH, GAME_HEIGHT);
 
     private readonly Stopwatch _timeTracker;
     private TimeSpan _previousElapsedTime;
@@ -103,10 +106,13 @@ internal sealed class GameEngine : IDisposable
         {
             switch ((SDL.EventType)@event.Type)
             {
+                case SDL.EventType.WindowResized:
+                    break;
                 case SDL.EventType.WindowPixelSizeChanged:
-                    _windowRenderer.Dispose();
+                    Window.UpdateWindowSize();
 
-                    _windowRenderer = Renderer.Create(Window, "software");
+                    //_windowRenderer = Renderer.Create(Window, "software");
+                    _windowTexture.Dispose();
                     _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
                     _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
 
@@ -172,19 +178,24 @@ internal sealed class GameEngine : IDisposable
         _presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
         _presentingRenderer.Clear();
 
+        SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, Window.Width, Window.Height, SDL.RendererLogicalPresentation.Disabled);
         _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
         _windowRenderer.Clear();
+
         SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
+        _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
+        _windowRenderer.Clear();
 
         _presentingRenderer.BlitPaletteIndexBitmap(BackgroundBitmap, 0, 0, BackgroundPalette);
         _presentingRenderer.BlitPaletteIndexBitmap(ForegroundBitmap, 0, 0, ForegroundPalette);
         _presentingRenderer.Present();
 
-        var windowTextureSurface = Surface.LockTexture(_windowTexture, nint.Zero);
+        if (Surface.LockTexture(_windowTexture, nint.Zero, out var windowTextureSurface))
+        {
+            _presentingSurface.BlitSurface(windowTextureSurface!, new SDL.Rect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
-        _presentingSurface.BlitSurface(windowTextureSurface, new SDL.Rect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
-
-        _windowTexture.Unlock();
+            _windowTexture.Unlock();
+        }
 
         _windowRenderer.RenderTexture(_windowTexture, new SDL.FRect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
@@ -194,6 +205,27 @@ internal sealed class GameEngine : IDisposable
     public void RequestToDie()
     {
         HasRequestedToDie = true;
+    }
+
+    public void BlitTextDefault
+    (
+        PaletteIndexBitmap destination,
+        uint destinationPositionX, uint destinationPositionY,
+        string text
+    )
+    {
+        var textBitmap = AssetKeeper.RequestBitmap("text_default");
+
+        uint offset = 0;
+        foreach (var character in text)
+        {
+            var characterString = character.ToString();
+
+            var characterFrame = AssetKeeper.RequestFrame($"text_{characterString}");
+
+            destination.Blit(textBitmap, destinationPositionX + offset * 8, destinationPositionY, characterFrame);
+            offset++;
+        }
     }
 
 

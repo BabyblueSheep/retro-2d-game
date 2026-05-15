@@ -18,11 +18,11 @@ internal sealed class Palette
     {
         get
         {
-            return _palette[(shade << PaletteIndexBitmap.CONTEXT_LENGTH_BITS) | (context)];
+            return _palette[(context << PaletteIndexBitmap.SHADE_LENGTH_BITS) | (shade)];
         }
         set
         {
-            _palette[(shade << PaletteIndexBitmap.CONTEXT_LENGTH_BITS) | (context)] = value;
+            _palette[(context << PaletteIndexBitmap.SHADE_LENGTH_BITS) | (shade)] = value;
         }
     }
 }

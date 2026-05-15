@@ -1,0 +1,11 @@
+{
+	"sprites": [
+		"player/player.png",
+		
+		
+		"text/text_default.png",
+		"text/text_highlighted.png"
+	],
+	"palette": "palette.png",
+	"export_folder": "generated/"
+}

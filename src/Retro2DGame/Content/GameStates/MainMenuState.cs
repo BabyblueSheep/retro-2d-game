@@ -1,3 +1,4 @@
+using Retro2DGame.Core.Extensions;
 using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.Game.UI;
@@ -5,6 +6,7 @@ using Retro2DGame.Core.SDL3;
 using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
 using System.Drawing;
+using System.Numerics;
 
 namespace Retro2DGame.Content.GameStates;
 
@@ -26,6 +28,8 @@ internal sealed class MainMenuState : GameState
     public override void Update(TimeSpan delta)
     {
         _testTimer += delta;
+
+        //SDL.LogInfo(SDL.LogCategory.Application, $"{Vector2.RemapLetterboxed(GameEngine.Inputs.MousePosition, GameEngine.Window.Size, GameEngine.GAME_SIZE)}");
 
         if (!ReferenceEquals(this, GameEngine.GameStates.Peek()))
             return;
@@ -69,7 +73,19 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress)
     {
-        GameEngine.AssetKeeper.RequestBitmap($"player_walk_{1 + (int)(_testTimer.TotalSeconds * 6) % 3}").Blit(GameEngine.ForegroundBitmap, 5, 5);
+        GameEngine.ForegroundBitmap.Blit
+        (
+            GameEngine.AssetKeeper.RequestBitmap($"player"),
+            5, 5,
+            GameEngine.AssetKeeper.RequestFrame($"player_walk_{(int)(_testTimer.TotalSeconds * 6) % 3}")
+        );
+
+        GameEngine.BlitTextDefault
+        (
+            GameEngine.ForegroundBitmap,
+            25, 25,
+            "hello, world!"
+        );
     }
 
     protected override void Dispose(bool disposing)

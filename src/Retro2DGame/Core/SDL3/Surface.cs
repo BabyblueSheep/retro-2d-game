@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection.Metadata;
 using System.Text;
+using static SDL3.SDL;
 
 namespace Retro2DGame.Core.SDL3;
 
@@ -76,28 +77,30 @@ internal sealed class Surface : IDisposable
         return surface;
     }
 
-    public static Surface LockTexture(Texture texture, nint rectangle)
+    public static bool LockTexture(Texture texture, nint rectangle, out Surface? surface)
     {
         var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
         if (!result || handle == nint.Zero)
         {
-            throw new Exception($"Couldn't lock texture: {SDL.GetError()}");
+            surface = null;
+            return result;
         }
 
-        var surface = new Surface(handle);
-        return surface;
+        surface = new Surface(handle);
+        return result;
     }
 
-    public static Surface LockTexture(Texture texture, SDL.Rect rectangle)
+    public static bool LockTexture(Texture texture, SDL.Rect rectangle, out Surface? surface)
     {
         var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
         if (!result || handle == nint.Zero)
         {
-            throw new Exception($"Couldn't lock texture: {SDL.GetError()}");
+            surface = null;
+            return result;
         }
 
-        var surface = new Surface(handle);
-        return surface;
+        surface = new Surface(handle);
+        return result;
     }
 
     public bool BlitSurface(Surface destination, nint sourceRectangle, nint destinationRectangle)
