@@ -1,4 +1,5 @@
-﻿using SDL3;
+﻿using Retro2DGame.Core.Extensions;
+using SDL3;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 
@@ -84,7 +85,7 @@ internal sealed class Inputs
         }
     }
 
-    public void UpdateEvent(SDL.Event @event)
+    public void UpdateEvent(SDL.Event @event, Vector2 windowSize, Vector2 gameSize)
     {
         switch (@event.Key.Type)
         {
@@ -108,6 +109,9 @@ internal sealed class Inputs
                 _previousMousePosition = _mousePosition;
                 _mousePosition.X = @event.Motion.X;
                 _mousePosition.Y = @event.Motion.Y;
+
+                _mousePosition = Vector2.RemapLetterboxed(_mousePosition, windowSize, gameSize);
+
                 break;
 
             case SDL.EventType.MouseButtonDown:

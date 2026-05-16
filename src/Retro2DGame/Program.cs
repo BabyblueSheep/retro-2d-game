@@ -31,8 +31,6 @@ internal sealed class Program
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
 
-        LoadAssets(gameEngine);
-
         gameEngine.GameStates.Push(new MainMenuState(gameEngine));
 
         gameEngine.Start();
@@ -45,55 +43,6 @@ internal sealed class Program
 		gameEngine.Dispose();
 
 		SDL.Quit();
-    }
-
-    private static void LoadAssets(GameEngine gameEngine)
-    {
-        string[] playerSpriteNames = [
-            "player",
-
-            "text_default",
-            "text_highlighted",
-        ];
-
-        foreach (var spriteName in playerSpriteNames)
-        {
-            var bitmap = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\{spriteName}.ptid");
-            gameEngine.AssetKeeper.AddBitmap(spriteName, bitmap);
-        }
-
-
-        gameEngine.AssetKeeper.AddFrame("player_idle", new Rectangle(0, 0, 16, 16));
-        gameEngine.AssetKeeper.AddFrame("player_walk_0", new Rectangle(16, 0, 16, 16));
-        gameEngine.AssetKeeper.AddFrame("player_walk_1", new Rectangle(16, 16, 16, 16));
-        gameEngine.AssetKeeper.AddFrame("player_walk_2", new Rectangle(16, 32, 16, 16));
-
-
-        string[] characterNames = [
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
-            "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-            "u", "v", "w", "x", "y", "z", ",", "!", ".", "?",
-            "-", " "
-        ];
-
-        for (int i = 0; i < characterNames.Length; i++)
-        {
-            var positionX = i % 10;
-            var positionY = i / 10;
-
-            var characterName = characterNames[i];
-
-            gameEngine.AssetKeeper.AddFrame($"text_{characterName}", new Rectangle(8 * positionX, 8 * positionY, 8, 8));
-        }
-
-
-        gameEngine.ForegroundPalette[0, 0] = Color.Transparent;
-        gameEngine.ForegroundPalette[1, 0] = Color.Red;
-        gameEngine.ForegroundPalette[2, 0] = Color.Green;
-        gameEngine.ForegroundPalette[3, 0] = Color.Yellow;
-
-        gameEngine.ForegroundPalette[31, 0] = Color.White;
     }
 }
 

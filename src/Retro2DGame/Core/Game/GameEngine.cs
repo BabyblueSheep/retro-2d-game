@@ -10,8 +10,8 @@ namespace Retro2DGame.Core.Game;
 
 internal sealed class GameEngine : IDisposable
 {
-    public const int DEFAULT_WINDOW_WIDTH = 640;
-    public const int DEFAULT_WINDOW_HEIGHT = 480;
+    public const int DEFAULT_WINDOW_WIDTH = 256 * 2;
+    public const int DEFAULT_WINDOW_HEIGHT = 256 * 2;
     public readonly Vector2 DEFAULT_WINDOW_SIZE = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
     public const int GAME_WIDTH = 256;
@@ -25,16 +25,17 @@ internal sealed class GameEngine : IDisposable
     private readonly TimeSpan _tickDuration;
     private readonly int _maxUpdateAmountPerTick;
 
-    private Surface _presentingSurface;
-    private Renderer _presentingRenderer;
+    private readonly Surface _presentingSurface;
+    private readonly Renderer _presentingRenderer;
 
-    private Renderer _windowRenderer;
-    private Texture _windowTexture;
+    private readonly Renderer _windowRenderer;
+    private readonly Texture _windowTexture;
 
 
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
-    public AssetKeeper AssetKeeper { get; }
+    public AssetStorage AssetStorage { get; }
+    public TextRenderer TextRenderer { get; }
 
     public Palette BackgroundPalette { get; }
     public Palette ForegroundPalette { get; }
@@ -69,13 +70,22 @@ internal sealed class GameEngine : IDisposable
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
-        AssetKeeper = new AssetKeeper();
+        AssetStorage = new AssetStorage();
+        TextRenderer = new TextRenderer(this);
 
         BackgroundPalette = new Palette();
         ForegroundPalette = new Palette(); 
         BackgroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
         ForegroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
 
+
+        ForegroundPalette[0, 0] = Color.Transparent;
+        ForegroundPalette[1, 0] = Color.Red;
+        ForegroundPalette[2, 0] = Color.Green;
+        ForegroundPalette[3, 0] = Color.Yellow;
+
+        ForegroundPalette[31, 0] = Color.White;
+        ForegroundPalette[31, 1] = Color.Salmon;
     }
 
     public void Start()
@@ -112,12 +122,12 @@ internal sealed class GameEngine : IDisposable
                     Window.UpdateWindowSize();
 
                     //_windowRenderer = Renderer.Create(Window, "software");
-                    _windowTexture.Dispose();
-                    _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
-                    _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
+                    //_windowTexture.Dispose();
+                    //_windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
+                    //_windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
 
-                    _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
-                    _windowRenderer.Clear();
+                    //_windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+                    //_windowRenderer.Clear();
                     break;
 
                 case SDL.EventType.KeyDown:
@@ -125,7 +135,7 @@ internal sealed class GameEngine : IDisposable
                 case SDL.EventType.MouseMotion:
                 case SDL.EventType.MouseButtonDown:
                 case SDL.EventType.MouseButtonUp:
-                    Inputs.UpdateEvent(@event);
+                    Inputs.UpdateEvent(@event, Window.Size, GAME_SIZE);
                     break;
                     
                 case SDL.EventType.Quit:
@@ -205,27 +215,6 @@ internal sealed class GameEngine : IDisposable
     public void RequestToDie()
     {
         HasRequestedToDie = true;
-    }
-
-    public void BlitTextDefault
-    (
-        PaletteIndexBitmap destination,
-        uint destinationPositionX, uint destinationPositionY,
-        string text
-    )
-    {
-        var textBitmap = AssetKeeper.RequestBitmap("text_default");
-
-        uint offset = 0;
-        foreach (var character in text)
-        {
-            var characterString = character.ToString();
-
-            var characterFrame = AssetKeeper.RequestFrame($"text_{characterString}");
-
-            destination.Blit(textBitmap, destinationPositionX + offset * 8, destinationPositionY, characterFrame);
-            offset++;
-        }
     }
 
 

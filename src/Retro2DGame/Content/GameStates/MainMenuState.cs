@@ -12,26 +12,56 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
-    private TimeSpan _testTimer;
+    private bool _shouldBeEffectivelyPaused = false;
 
-    private int _selectedOption;
+    private int _selectedOption = 0;
 
-    private UIButton _menuButtonPlay;
+    private readonly UIButton _menuButtonPlay;
+    private readonly UIButton _menuButtonSettings;
+    private readonly UIButton _menuButtonQuit;
 
     public MainMenuState(GameEngine engine) : base(engine)
     {
-        _testTimer = TimeSpan.Zero;
+        _menuButtonPlay = new UIButton(() =>
+        {
+            if (_menuButtonPlay!.State != UIButtonState.Idle)
+                _selectedOption = 0;
 
-        _menuButtonPlay = new UIButton(() => { });
+            if (_menuButtonPlay!.State == UIButtonState.Pressed && _menuButtonPlay.PreviousState != UIButtonState.Pressed)
+                SDL.LogInfo(SDL.LogCategory.Application, "Play");
+        })
+        {
+            BoundingBox = new Rectangle(176, 192, TextRenderer.GetTextWidth("Play"), TextRenderer.GetTextHeight())
+        };
+
+        _menuButtonSettings = new UIButton(() =>
+        {
+            if (_menuButtonSettings!.State != UIButtonState.Idle)
+                _selectedOption = 1;
+
+            if (_menuButtonSettings!.State == UIButtonState.Pressed && _menuButtonSettings.PreviousState != UIButtonState.Pressed)
+                SDL.LogInfo(SDL.LogCategory.Application, "Settings");
+        })
+        {
+            BoundingBox = new Rectangle(176, 208, 8 * 8, 8)
+        };
+
+        _menuButtonQuit = new UIButton(() => 
+        {
+            if (_menuButtonQuit!.State != UIButtonState.Idle)
+                _selectedOption = 2;
+
+            if (_menuButtonQuit!.State == UIButtonState.Pressed && _menuButtonQuit.PreviousState != UIButtonState.Pressed)
+                SDL.LogInfo(SDL.LogCategory.Application, "Quit");
+        })
+        {
+            BoundingBox = new Rectangle(176, 224, 8 * 4, 8)
+        };
     }
 
     public override void Update(TimeSpan delta)
     {
-        _testTimer += delta;
-
-        //SDL.LogInfo(SDL.LogCategory.Application, $"{Vector2.RemapLetterboxed(GameEngine.Inputs.MousePosition, GameEngine.Window.Size, GameEngine.GAME_SIZE)}");
-
-        if (!ReferenceEquals(this, GameEngine.GameStates.Peek()))
+        if (_shouldBeEffectivelyPaused)
             return;
 
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
@@ -43,12 +73,50 @@ internal sealed class MainMenuState : GameState
             _selectedOption++;
         }
 
-        if (_selectedOption < 0)
-            _selectedOption = 2;
-        if (_selectedOption > 2)
-            _selectedOption = 0;
+        _selectedOption = (_selectedOption + 3) % 3;
 
-        if (GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm))
+        var shouldUseMouseForButtonInputs = false;
+        shouldUseMouseForButtonInputs |= GameEngine.Inputs.IsMouseDown != GameEngine.Inputs.WasMouseDown;
+        shouldUseMouseForButtonInputs |= GameEngine.Inputs.MousePosition != GameEngine.Inputs.PreviousMousePosition;
+
+        if (shouldUseMouseForButtonInputs)
+        {
+            shouldUseMouseForButtonInputs = false;
+            shouldUseMouseForButtonInputs |= _menuButtonPlay.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
+            shouldUseMouseForButtonInputs |= _menuButtonSettings.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
+            shouldUseMouseForButtonInputs |= _menuButtonQuit.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
+        }
+
+        if (shouldUseMouseForButtonInputs)
+        {
+            _menuButtonPlay.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
+            _menuButtonSettings.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
+            _menuButtonQuit.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
+        }
+        else
+        {
+            var isPressingButton = GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm);
+            switch (_selectedOption)
+            {
+                case 0:
+                    _menuButtonPlay.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
+                    _menuButtonSettings.State = UIButtonState.Idle;
+                    _menuButtonQuit.State = UIButtonState.Idle;
+                    break;
+                case 1:
+                    _menuButtonPlay.State = UIButtonState.Idle;
+                    _menuButtonSettings.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
+                    _menuButtonQuit.State = UIButtonState.Idle;
+                    break;
+                case 2:
+                    _menuButtonPlay.State = UIButtonState.Idle;
+                    _menuButtonSettings.State = UIButtonState.Idle;
+                    _menuButtonQuit.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
+                    break;
+            }
+        }
+
+        /*if (GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm))
         {
             switch (_selectedOption)
             {
@@ -63,7 +131,7 @@ internal sealed class MainMenuState : GameState
                     GameEngine.RequestToDie();
                     break;
             }
-        }
+        }*/
     }
 
     public override void FixedUpdate(TimeSpan delta)
@@ -73,18 +141,40 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress)
     {
-        GameEngine.ForegroundBitmap.Blit
-        (
-            GameEngine.AssetKeeper.RequestBitmap($"player"),
-            5, 5,
-            GameEngine.AssetKeeper.RequestFrame($"player_walk_{(int)(_testTimer.TotalSeconds * 6) % 3}")
-        );
-
-        GameEngine.BlitTextDefault
+        var playText = "Play";
+        if (_menuButtonPlay.State == UIButtonState.Highlighted)
+        {
+            playText = string.Concat("{", playText, "}");
+        }
+        GameEngine.TextRenderer.BlitTextDefault
         (
             GameEngine.ForegroundBitmap,
-            25, 25,
-            "hello, world!"
+            176, 192,
+            playText
+        );
+
+        var settingsText = "Settings";
+        if (_menuButtonSettings.State == UIButtonState.Highlighted)
+        {
+            settingsText = string.Concat("{", settingsText, "}");
+        }
+        GameEngine.TextRenderer.BlitTextDefault
+        (
+            GameEngine.ForegroundBitmap,
+            176, 208,
+            settingsText
+        );
+
+        var quitText = "Quit";
+        if (_menuButtonQuit.State == UIButtonState.Highlighted)
+        {
+            quitText = string.Concat("{", quitText, "}");
+        }
+        GameEngine.TextRenderer.BlitTextDefault
+        (
+            GameEngine.ForegroundBitmap,
+            176, 224,
+            quitText
         );
     }
 
