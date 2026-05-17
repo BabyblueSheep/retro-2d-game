@@ -12,8 +12,6 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
-    private bool _shouldBeEffectivelyPaused = false;
-
     private int _selectedOption = 0;
 
     private readonly UIButton _menuButtonPlay;
@@ -31,7 +29,7 @@ internal sealed class MainMenuState : GameState
                 SDL.LogInfo(SDL.LogCategory.Application, "Play");
         })
         {
-            BoundingBox = new Rectangle(176, 192, TextRenderer.GetTextWidth("Play"), TextRenderer.GetTextHeight())
+            BoundingBox = RectangleF.Inflate(new Rectangle(176, 192, TextRenderer.GetTextWidth("Play"), TextRenderer.GetTextHeight()), 4, 4)
         };
 
         _menuButtonSettings = new UIButton(() =>
@@ -43,7 +41,7 @@ internal sealed class MainMenuState : GameState
                 SDL.LogInfo(SDL.LogCategory.Application, "Settings");
         })
         {
-            BoundingBox = new Rectangle(176, 208, 8 * 8, 8)
+            BoundingBox = RectangleF.Inflate(new Rectangle(176, 208, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()), 4, 4)
         };
 
         _menuButtonQuit = new UIButton(() => 
@@ -55,15 +53,12 @@ internal sealed class MainMenuState : GameState
                 SDL.LogInfo(SDL.LogCategory.Application, "Quit");
         })
         {
-            BoundingBox = new Rectangle(176, 224, 8 * 4, 8)
+            BoundingBox = RectangleF.Inflate(new Rectangle(176, 224, TextRenderer.GetTextWidth("Quit"), TextRenderer.GetTextHeight()), 4, 4)
         };
     }
 
     public override void Update(TimeSpan delta)
     {
-        if (_shouldBeEffectivelyPaused)
-            return;
-
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
         {
             _selectedOption--;
@@ -76,7 +71,7 @@ internal sealed class MainMenuState : GameState
         _selectedOption = (_selectedOption + 3) % 3;
 
         var shouldUseMouseForButtonInputs = false;
-        shouldUseMouseForButtonInputs |= GameEngine.Inputs.IsMouseDown != GameEngine.Inputs.WasMouseDown;
+        shouldUseMouseForButtonInputs |= GameEngine.Inputs.IsMouseLeftClickDown != GameEngine.Inputs.WasMouseLeftClickDown;
         shouldUseMouseForButtonInputs |= GameEngine.Inputs.MousePosition != GameEngine.Inputs.PreviousMousePosition;
 
         if (shouldUseMouseForButtonInputs)
@@ -89,9 +84,9 @@ internal sealed class MainMenuState : GameState
 
         if (shouldUseMouseForButtonInputs)
         {
-            _menuButtonPlay.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
-            _menuButtonSettings.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
-            _menuButtonQuit.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseDown);
+            _menuButtonPlay.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
+            _menuButtonSettings.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
+            _menuButtonQuit.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
         }
         else
         {

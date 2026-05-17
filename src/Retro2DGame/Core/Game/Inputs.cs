@@ -38,8 +38,11 @@ internal sealed class Inputs
     private Vector2 _previousMousePosition;
     public Vector2 MousePosition => _mousePosition;
     public Vector2 PreviousMousePosition => _previousMousePosition;
-    public bool IsMouseDown { get; private set; }
-    public bool WasMouseDown { get; private set; }
+    public bool IsMouseLeftClickDown { get; private set; }
+    public bool WasMouseLeftClickDown { get; private set; }
+    public bool IsMouseRightClickDown { get; private set; }
+    public bool WasMouseRightClickDown { get; private set; }
+
 
     private readonly Dictionary<InputButtonType, (HashSet<SDL.Scancode>, InputButtonState)> _buttonStates;
 
@@ -73,8 +76,10 @@ internal sealed class Inputs
 
     public void Propagate()
     {
-        WasMouseDown = IsMouseDown;
-        
+        WasMouseLeftClickDown = IsMouseLeftClickDown;
+        WasMouseRightClickDown = IsMouseRightClickDown;
+        _previousMousePosition = _mousePosition;
+
         foreach (var inputButtonType in _buttonStates.Keys)
         {
             var buttonState = _buttonStates[inputButtonType];
@@ -106,7 +111,6 @@ internal sealed class Inputs
                 break;
 
             case SDL.EventType.MouseMotion:
-                _previousMousePosition = _mousePosition;
                 _mousePosition.X = @event.Motion.X;
                 _mousePosition.Y = @event.Motion.Y;
 
@@ -115,10 +119,16 @@ internal sealed class Inputs
                 break;
 
             case SDL.EventType.MouseButtonDown:
-                IsMouseDown = true;
+                if (@event.Button.Button == SDL.ButtonLeft)
+                    IsMouseLeftClickDown = true;
+                if (@event.Button.Button == SDL.ButtonRight)
+                    IsMouseRightClickDown = true;
                 break;
-            case SDL.EventType.MouseButtonUp: 
-                IsMouseDown = false;
+            case SDL.EventType.MouseButtonUp:
+                if (@event.Button.Button == SDL.ButtonLeft)
+                    IsMouseLeftClickDown = false;
+                if (@event.Button.Button == SDL.ButtonRight)
+                    IsMouseRightClickDown = false;
                 break;
 
             default:
