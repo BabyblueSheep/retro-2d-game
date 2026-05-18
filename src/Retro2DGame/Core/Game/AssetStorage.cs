@@ -132,6 +132,54 @@ internal sealed class AssetStorage
     [SpriteFrame("text_highlighted", [4, 4], [8, 8])] public PaletteIndexBitmap TextHighlightedHyphen { get; private set; }
     #endregion
 
+    #region text_pressed
+    [SpriteFrame("text_pressed", [0, 0], [8, 8])] public PaletteIndexBitmap TextPressed0 { get; private set; }
+    [SpriteFrame("text_pressed", [1, 0], [8, 8])] public PaletteIndexBitmap TextPressed1 { get; private set; }
+    [SpriteFrame("text_pressed", [2, 0], [8, 8])] public PaletteIndexBitmap TextPressed2 { get; private set; }
+    [SpriteFrame("text_pressed", [3, 0], [8, 8])] public PaletteIndexBitmap TextPressed3 { get; private set; }
+    [SpriteFrame("text_pressed", [4, 0], [8, 8])] public PaletteIndexBitmap TextPressed4 { get; private set; }
+    [SpriteFrame("text_pressed", [5, 0], [8, 8])] public PaletteIndexBitmap TextPressed5 { get; private set; }
+    [SpriteFrame("text_pressed", [6, 0], [8, 8])] public PaletteIndexBitmap TextPressed6 { get; private set; }
+    [SpriteFrame("text_pressed", [7, 0], [8, 8])] public PaletteIndexBitmap TextPressed7 { get; private set; }
+    [SpriteFrame("text_pressed", [8, 0], [8, 8])] public PaletteIndexBitmap TextPressed8 { get; private set; }
+    [SpriteFrame("text_pressed", [9, 0], [8, 8])] public PaletteIndexBitmap TextPressed9 { get; private set; }
+
+    [SpriteFrame("text_pressed", [0, 1], [8, 8])] public PaletteIndexBitmap TextPressedA { get; private set; }
+    [SpriteFrame("text_pressed", [1, 1], [8, 8])] public PaletteIndexBitmap TextPressedB { get; private set; }
+    [SpriteFrame("text_pressed", [2, 1], [8, 8])] public PaletteIndexBitmap TextPressedC { get; private set; }
+    [SpriteFrame("text_pressed", [3, 1], [8, 8])] public PaletteIndexBitmap TextPressedD { get; private set; }
+    [SpriteFrame("text_pressed", [4, 1], [8, 8])] public PaletteIndexBitmap TextPressedE { get; private set; }
+    [SpriteFrame("text_pressed", [5, 1], [8, 8])] public PaletteIndexBitmap TextPressedF { get; private set; }
+    [SpriteFrame("text_pressed", [6, 1], [8, 8])] public PaletteIndexBitmap TextPressedG { get; private set; }
+    [SpriteFrame("text_pressed", [7, 1], [8, 8])] public PaletteIndexBitmap TextPressedH { get; private set; }
+    [SpriteFrame("text_pressed", [8, 1], [8, 8])] public PaletteIndexBitmap TextPressedI { get; private set; }
+    [SpriteFrame("text_pressed", [9, 1], [8, 8])] public PaletteIndexBitmap TextPressedJ { get; private set; }
+
+    [SpriteFrame("text_pressed", [0, 2], [8, 8])] public PaletteIndexBitmap TextPressedK { get; private set; }
+    [SpriteFrame("text_pressed", [1, 2], [8, 8])] public PaletteIndexBitmap TextPressedL { get; private set; }
+    [SpriteFrame("text_pressed", [2, 2], [8, 8])] public PaletteIndexBitmap TextPressedM { get; private set; }
+    [SpriteFrame("text_pressed", [3, 2], [8, 8])] public PaletteIndexBitmap TextPressedN { get; private set; }
+    [SpriteFrame("text_pressed", [4, 2], [8, 8])] public PaletteIndexBitmap TextPressedO { get; private set; }
+    [SpriteFrame("text_pressed", [5, 2], [8, 8])] public PaletteIndexBitmap TextPressedP { get; private set; }
+    [SpriteFrame("text_pressed", [6, 2], [8, 8])] public PaletteIndexBitmap TextPressedQ { get; private set; }
+    [SpriteFrame("text_pressed", [7, 2], [8, 8])] public PaletteIndexBitmap TextPressedR { get; private set; }
+    [SpriteFrame("text_pressed", [8, 2], [8, 8])] public PaletteIndexBitmap TextPressedS { get; private set; }
+    [SpriteFrame("text_pressed", [9, 2], [8, 8])] public PaletteIndexBitmap TextPressedT { get; private set; }
+
+    [SpriteFrame("text_pressed", [0, 3], [8, 8])] public PaletteIndexBitmap TextPressedU { get; private set; }
+    [SpriteFrame("text_pressed", [1, 3], [8, 8])] public PaletteIndexBitmap TextPressedV { get; private set; }
+    [SpriteFrame("text_pressed", [2, 3], [8, 8])] public PaletteIndexBitmap TextPressedW { get; private set; }
+    [SpriteFrame("text_pressed", [3, 3], [8, 8])] public PaletteIndexBitmap TextPressedX { get; private set; }
+    [SpriteFrame("text_pressed", [4, 3], [8, 8])] public PaletteIndexBitmap TextPressedY { get; private set; }
+    [SpriteFrame("text_pressed", [5, 3], [8, 8])] public PaletteIndexBitmap TextPressedZ { get; private set; }
+
+    [SpriteFrame("text_pressed", [0, 4], [8, 8])] public PaletteIndexBitmap TextPressedComma { get; private set; }
+    [SpriteFrame("text_pressed", [1, 4], [8, 8])] public PaletteIndexBitmap TextPressedExclamationMark { get; private set; }
+    [SpriteFrame("text_pressed", [2, 4], [8, 8])] public PaletteIndexBitmap TextPressedPeriod { get; private set; }
+    [SpriteFrame("text_pressed", [3, 4], [8, 8])] public PaletteIndexBitmap TextPressedQuestionMark { get; private set; }
+    [SpriteFrame("text_pressed", [4, 4], [8, 8])] public PaletteIndexBitmap TextPressedHyphen { get; private set; }
+    #endregion
+
 
 
 
@@ -145,6 +193,7 @@ internal sealed class AssetStorage
             ["player"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\player.ptid"),
             ["text_default"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\text_default.ptid"),
             ["text_highlighted"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\text_highlighted.ptid"),
+            ["text_pressed"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\text_pressed.ptid"),
         };
 
         var assetStorageType = GetType();

@@ -1,7 +1,6 @@
-﻿using Retro2DGame.Core.Extensions;
+﻿using Retro2DGame.Core.NetExtensions;
 using SDL3;
 using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Retro2DGame.Core.Game;
 

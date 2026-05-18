@@ -35,7 +35,6 @@ internal sealed class GameEngine : IDisposable
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
     public AssetStorage AssetStorage { get; }
-    public TextRenderer TextRenderer { get; }
 
     public Palette BackgroundPalette { get; }
     public Palette ForegroundPalette { get; }
@@ -71,7 +70,6 @@ internal sealed class GameEngine : IDisposable
         Inputs = new Inputs();
         GameStates = new GameStateStack();
         AssetStorage = new AssetStorage();
-        TextRenderer = new TextRenderer(this);
 
         BackgroundPalette = new Palette();
         ForegroundPalette = new Palette(); 
@@ -84,8 +82,7 @@ internal sealed class GameEngine : IDisposable
         ForegroundPalette[2, 0] = Color.Green;
         ForegroundPalette[3, 0] = Color.Yellow;
 
-        ForegroundPalette[31, 0] = Color.White;
-        ForegroundPalette[31, 1] = Color.Salmon;
+        ForegroundPalette[31, 0] = Color.White; ForegroundPalette[31, 1] = Color.Moccasin; ForegroundPalette[31, 2] = Color.SandyBrown;
     }
 
     public void Start()

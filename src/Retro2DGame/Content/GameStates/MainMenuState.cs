@@ -1,4 +1,4 @@
-using Retro2DGame.Core.Extensions;
+using Retro2DGame.Core.NetExtensions;
 using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.Game.UI;
@@ -12,104 +12,72 @@ namespace Retro2DGame.Content.GameStates;
 
 internal sealed class MainMenuState : GameState
 {
-    private int _selectedOption = 0;
-
-    private readonly UIButton _menuButtonPlay;
-    private readonly UIButton _menuButtonSettings;
-    private readonly UIButton _menuButtonQuit;
+    private readonly UIButtonGroup _buttonGroup;
 
     public MainMenuState(GameEngine engine) : base(engine)
     {
-        _menuButtonPlay = new UIButton(() =>
-        {
-            if (_menuButtonPlay!.State != UIButtonState.Idle)
-                _selectedOption = 0;
+        _buttonGroup = new UIButtonGroup
+        (
+            new UITextButton(
+                (UIButton button) =>
+                {
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                        SDL.LogInfo(SDL.LogCategory.Application, "Play");
+                }
+            )
+            {
+                OriginalBoundingBox = new RectangleF(176, 192, 1, 1),
+                Text = "Play",
+                Margin = new Vector2(4, 4)
+            },
 
-            if (_menuButtonPlay!.State == UIButtonState.Pressed && _menuButtonPlay.PreviousState != UIButtonState.Pressed)
-                SDL.LogInfo(SDL.LogCategory.Application, "Play");
-        })
-        {
-            BoundingBox = RectangleF.Inflate(new Rectangle(176, 192, TextRenderer.GetTextWidth("Play"), TextRenderer.GetTextHeight()), 4, 4)
-        };
+            new UITextButton(
+                (UIButton button) =>
+                {
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                        SDL.LogInfo(SDL.LogCategory.Application, "Settings");
+                }
+            )
+            {
+                OriginalBoundingBox = new RectangleF(176, 208, 1, 1),
+                Text = "Settings",
+                Margin = new Vector2(4, 4)
+            },
 
-        _menuButtonSettings = new UIButton(() =>
-        {
-            if (_menuButtonSettings!.State != UIButtonState.Idle)
-                _selectedOption = 1;
-
-            if (_menuButtonSettings!.State == UIButtonState.Pressed && _menuButtonSettings.PreviousState != UIButtonState.Pressed)
-                SDL.LogInfo(SDL.LogCategory.Application, "Settings");
-        })
-        {
-            BoundingBox = RectangleF.Inflate(new Rectangle(176, 208, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()), 4, 4)
-        };
-
-        _menuButtonQuit = new UIButton(() => 
-        {
-            if (_menuButtonQuit!.State != UIButtonState.Idle)
-                _selectedOption = 2;
-
-            if (_menuButtonQuit!.State == UIButtonState.Pressed && _menuButtonQuit.PreviousState != UIButtonState.Pressed)
-                SDL.LogInfo(SDL.LogCategory.Application, "Quit");
-        })
-        {
-            BoundingBox = RectangleF.Inflate(new Rectangle(176, 224, TextRenderer.GetTextWidth("Quit"), TextRenderer.GetTextHeight()), 4, 4)
-        };
+            new UITextButton(
+                (UIButton button) =>
+                {
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                        SDL.LogInfo(SDL.LogCategory.Application, "Quit");
+                }
+            )
+            {
+                OriginalBoundingBox = new RectangleF(176, 224, 1, 1),
+                Text = "Quit",
+                Margin = new Vector2(4, 4)
+            }
+        );
     }
 
     public override void Update(TimeSpan delta)
     {
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
         {
-            _selectedOption--;
+            _buttonGroup.DecrementSelectedIndex();
         }
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuDown) && !GameEngine.Inputs.WasDown(InputButtonType.MenuDown))
         {
-            _selectedOption++;
+            _buttonGroup.IncrementSelectedIndex();
         }
 
-        _selectedOption = (_selectedOption + 3) % 3;
+        _buttonGroup.PropagateState();
 
-        var shouldUseMouseForButtonInputs = false;
-        shouldUseMouseForButtonInputs |= GameEngine.Inputs.IsMouseLeftClickDown != GameEngine.Inputs.WasMouseLeftClickDown;
-        shouldUseMouseForButtonInputs |= GameEngine.Inputs.MousePosition != GameEngine.Inputs.PreviousMousePosition;
-
-        if (shouldUseMouseForButtonInputs)
-        {
-            shouldUseMouseForButtonInputs = false;
-            shouldUseMouseForButtonInputs |= _menuButtonPlay.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
-            shouldUseMouseForButtonInputs |= _menuButtonSettings.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
-            shouldUseMouseForButtonInputs |= _menuButtonQuit.BoundingBox.Contains(GameEngine.Inputs.MousePosition.X, GameEngine.Inputs.MousePosition.Y);
-        }
-
-        if (shouldUseMouseForButtonInputs)
-        {
-            _menuButtonPlay.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
-            _menuButtonSettings.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
-            _menuButtonQuit.ProcessMouseInputs(GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown);
-        }
-        else
-        {
-            var isPressingButton = GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm);
-            switch (_selectedOption)
-            {
-                case 0:
-                    _menuButtonPlay.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
-                    _menuButtonSettings.State = UIButtonState.Idle;
-                    _menuButtonQuit.State = UIButtonState.Idle;
-                    break;
-                case 1:
-                    _menuButtonPlay.State = UIButtonState.Idle;
-                    _menuButtonSettings.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
-                    _menuButtonQuit.State = UIButtonState.Idle;
-                    break;
-                case 2:
-                    _menuButtonPlay.State = UIButtonState.Idle;
-                    _menuButtonSettings.State = UIButtonState.Idle;
-                    _menuButtonQuit.State = isPressingButton ? UIButtonState.Pressed : UIButtonState.Highlighted;
-                    break;
-            }
-        }
+        _buttonGroup.ProcessButtons
+        (
+            GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm),
+            GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown,
+            GameEngine.Inputs.PreviousMousePosition, GameEngine.Inputs.WasMouseLeftClickDown
+        );
 
         /*if (GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm))
         {
@@ -136,41 +104,7 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress)
     {
-        var playText = "Play";
-        if (_menuButtonPlay.State == UIButtonState.Highlighted)
-        {
-            playText = string.Concat("{", playText, "}");
-        }
-        GameEngine.TextRenderer.BlitTextDefault
-        (
-            GameEngine.ForegroundBitmap,
-            176, 192,
-            playText
-        );
-
-        var settingsText = "Settings";
-        if (_menuButtonSettings.State == UIButtonState.Highlighted)
-        {
-            settingsText = string.Concat("{", settingsText, "}");
-        }
-        GameEngine.TextRenderer.BlitTextDefault
-        (
-            GameEngine.ForegroundBitmap,
-            176, 208,
-            settingsText
-        );
-
-        var quitText = "Quit";
-        if (_menuButtonQuit.State == UIButtonState.Highlighted)
-        {
-            quitText = string.Concat("{", quitText, "}");
-        }
-        GameEngine.TextRenderer.BlitTextDefault
-        (
-            GameEngine.ForegroundBitmap,
-            176, 224,
-            quitText
-        );
+        _buttonGroup.Render(GameEngine.AssetStorage, GameEngine.ForegroundBitmap);
     }
 
     protected override void Dispose(bool disposing)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Retro2DGame.Core.Game.Rendering;
+using Retro2DGame.Core.NetExtensions;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
@@ -6,19 +8,18 @@ using System.Text;
 
 namespace Retro2DGame.Core.Game.UI;
 
-internal enum UIButtonState
+internal abstract class UIButton
 {
-    Idle,
-    Highlighted,
-    Pressed,
-}
+    internal enum ButtonState
+    {
+        Idle,
+        Highlighted,
+        Held,
+    }
 
-internal sealed class UIButton
-{
-
-    private UIButtonState _state;
-    public UIButtonState PreviousState { get; private set; }
-    public UIButtonState State
+    private ButtonState _state;
+    public ButtonState PreviousState { get; private set; }
+    public ButtonState State
     {
         get { return _state; }
         set
@@ -27,36 +28,65 @@ internal sealed class UIButton
             _state = value;
             if (didStateChange)
             {
-                OnStateChange();
+                OnStateChange(this);
             }
         }
     }
-    public RectangleF BoundingBox { get; set; }
 
-    public Action OnStateChange { get; }
+    public RectangleF OriginalBoundingBox { get; set; }
+    public Vector2 Margin { get; set; }
 
-    public UIButton(Action onStateChange)
+    public RectangleF BoundingBox => OriginalBoundingBox.Inflated(Margin.X, Margin.Y);
+
+    public Action<UIButton> OnStateChange { get; }
+
+    public UIButton(Action<UIButton> onStateChange)
     {
         OnStateChange = onStateChange;
     }
 
-    public void Update()
+    public void PropagateState()
     {
-        PreviousState = State;
+        PreviousState = _state;
     }
 
-    public void ProcessMouseInputs(Vector2 mousePosition, bool isMouseDown)
+    public abstract void Render(AssetStorage assets, PaletteIndexBitmap destination);
+}
+
+internal sealed class UITextButton : UIButton
+{
+    private string _text;
+
+    public string Text
     {
-        if (!BoundingBox.Contains(mousePosition.X, mousePosition.Y))
+        get
         {
-            State = UIButtonState.Idle;
-            return;
+            return _text;
         }
-        if (!isMouseDown)
+        set
         {
-            State = UIButtonState.Highlighted;
-            return;
+            _text = value;
+            OriginalBoundingBox = new RectangleF(OriginalBoundingBox.X, OriginalBoundingBox.Y, TextRenderer.GetTextWidth(_text), TextRenderer.GetTextHeight());
         }
-        State = UIButtonState.Pressed;
+    }
+
+    public UITextButton(Action<UIButton> onStateChange) : base(onStateChange)
+    {
+        _text = "";
+    }
+
+    public override void Render(AssetStorage assets, PaletteIndexBitmap destination)
+    {
+        var textToRender = Text;
+        if (State == ButtonState.Highlighted)
+        {
+            textToRender = string.Concat("{", Text, "}");
+        }
+        if (State == ButtonState.Held)
+        {
+            textToRender = string.Concat("{{", Text, "}}");
+        }
+
+        TextRenderer.BlitText(assets, destination, (uint)OriginalBoundingBox.X, (uint)OriginalBoundingBox.Y, textToRender);
     }
 }

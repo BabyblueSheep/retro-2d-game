@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace Retro2DGame.Core.Extensions;
+namespace Retro2DGame.Core.NetExtensions;
 
-internal static class NetExtensions
+internal static partial class NetExtensions
 {
     extension (Vector2 _)
     {
