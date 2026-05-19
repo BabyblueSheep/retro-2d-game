@@ -7,29 +7,32 @@ internal sealed class UIButtonGroup
 {
     private readonly UIButton[] _buttons;
 
-    public int CurrentlySelectedIndex { get; private set; }
-    public bool HasAnyButtonBeenPressedThisMousePress { get; private set; }
+    private int _currentlySelectedIndex;
 
     public UIButtonGroup(params UIButton[] buttons)
     {
         _buttons = buttons;
-        CurrentlySelectedIndex = 0;
+        _currentlySelectedIndex = 0;
     }
 
     private void WrapSelectedIndex()
     {
-        CurrentlySelectedIndex = (CurrentlySelectedIndex + _buttons.Length) % _buttons.Length;
+        while (_currentlySelectedIndex < 0)
+        {
+            _currentlySelectedIndex += _buttons.Length;
+        }
+        _currentlySelectedIndex %= _buttons.Length;
     }
 
-    public void IncrementSelectedIndex()
+    public void IncrementSelectedIndex(int amount = 1)
     {
-        CurrentlySelectedIndex++;
+        _currentlySelectedIndex += amount;
         WrapSelectedIndex();
     }
 
-    public void DecrementSelectedIndex()
+    public void DecrementSelectedIndex(int amount = 1)
     {
-        CurrentlySelectedIndex--;
+        _currentlySelectedIndex -= amount;
         WrapSelectedIndex();
     }
 
@@ -38,16 +41,7 @@ internal sealed class UIButtonGroup
         var button = _buttons[index];
         if (button.State != UIButton.ButtonState.Idle)
         {
-            CurrentlySelectedIndex = index;
-        }
-    }
-
-    private void TryMarkAnyButtonAsPressed(int index)
-    {
-        var button = _buttons[index];
-        if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
-        {
-            HasAnyButtonBeenPressedThisMousePress = true;
+            _currentlySelectedIndex = index;
         }
     }
 
@@ -67,9 +61,8 @@ internal sealed class UIButtonGroup
         }
 
         var isMouseCurrentlyHoldingButton = button.BoundingBox.Contains(mousePosition.X, mousePosition.Y) && isMouseDown;
-        var wasMousePreviouslyHoldingButton = button.BoundingBox.Contains(previousMousePosition.X, previousMousePosition.Y) && wasMouseDown;
 
-        if (isMouseCurrentlyHoldingButton)
+        if (isMouseCurrentlyHoldingButton && (!wasMouseDown || button.PreviousState == UIButton.ButtonState.Held))
         {
             button.State = UIButton.ButtonState.Held;
         }
@@ -82,14 +75,14 @@ internal sealed class UIButtonGroup
     private void ProcessButtonManual
     (
         int index,
-        bool didManuallyPress
+        bool isManuallyPressing, bool wasManuallyPressing
     )
     {
         var button = _buttons[index];
 
-        if (index == CurrentlySelectedIndex)
+        if (index == _currentlySelectedIndex)
         {
-            button.State = didManuallyPress ? UIButton.ButtonState.Held : UIButton.ButtonState.Highlighted;
+            button.State = (isManuallyPressing && (!wasManuallyPressing || button.PreviousState == UIButton.ButtonState.Held)) ? UIButton.ButtonState.Held : UIButton.ButtonState.Highlighted;
         }
         else
         {
@@ -107,16 +100,11 @@ internal sealed class UIButtonGroup
 
     public void ProcessButtons
     (
-        bool didManuallyPress,
+        bool isManuallyPressing, bool wasManuallyPressing,
         Vector2 mousePosition, bool isMouseDown,
         Vector2 previousMousePosition, bool wasMouseDown
     )
     {
-        if (!isMouseDown)
-        {
-            HasAnyButtonBeenPressedThisMousePress = false;
-        }
-
         var shouldUseMouseForButtonInputs = isMouseDown;
         shouldUseMouseForButtonInputs |= isMouseDown != wasMouseDown;
         shouldUseMouseForButtonInputs |= mousePosition != previousMousePosition;
@@ -136,16 +124,14 @@ internal sealed class UIButtonGroup
             {
                 ProcessButtonMouse(i, mousePosition, isMouseDown, previousMousePosition, wasMouseDown);
                 TryForceSelectedIndex(i);
-                TryMarkAnyButtonAsPressed(i);
             }
         }
         else
         {
             for (int i = 0; i < _buttons.Length; i++)
             {
-                ProcessButtonManual(i, didManuallyPress);
+                ProcessButtonManual(i, isManuallyPressing, wasManuallyPressing);
                 TryForceSelectedIndex(i);
-                TryMarkAnyButtonAsPressed(i);
             }
         }
     }

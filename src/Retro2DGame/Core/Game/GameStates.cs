@@ -14,6 +14,9 @@ internal abstract class GameState : IDisposable
         GameEngine = gameEngine; 
     }
 
+    public abstract void Enter();
+    public abstract void Exit();
+
     public abstract void Update(TimeSpan delta);
     public abstract void FixedUpdate(TimeSpan delta);
 
@@ -51,6 +54,7 @@ internal sealed class GameStateStack
 
     public void Push(GameState gameState)
     {
+        gameState.Enter();
         _gameStates.Add(gameState);
     }
 
@@ -64,6 +68,7 @@ internal sealed class GameStateStack
     {
         var gameState = _gameStates[^1];
         _gameStates.RemoveAt(_gameStates.Count - 1);
+        gameState.Exit();
         return gameState;
     }
 }

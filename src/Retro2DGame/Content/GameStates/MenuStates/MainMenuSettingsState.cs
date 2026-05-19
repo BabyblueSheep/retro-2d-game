@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Retro2DGame.Content.GameStates;
+namespace Retro2DGame.Content.GameStates.MenuStates;
 
 internal class MainMenuSettingsState : GameState
 {
@@ -22,6 +22,16 @@ internal class MainMenuSettingsState : GameState
 
     public MainMenuSettingsState(GameEngine gameEngine) : base(gameEngine)
     {
+    }
+
+    public override void Enter()
+    {
+
+    }
+
+    public override void Exit()
+    {
+
     }
 
     public override void Update(TimeSpan delta)

@@ -36,10 +36,8 @@ internal sealed class GameEngine : IDisposable
     public GameStateStack GameStates { get; }
     public AssetStorage AssetStorage { get; }
 
-    public Palette BackgroundPalette { get; }
-    public Palette ForegroundPalette { get; }
-    public PaletteIndexBitmap BackgroundBitmap { get; }
-    public PaletteIndexBitmap ForegroundBitmap { get; }
+    public Palette Palette { get; }
+    public PaletteIndexBitmap Bitmap { get; }
 
     public Window Window { get; }
 
@@ -71,18 +69,20 @@ internal sealed class GameEngine : IDisposable
         GameStates = new GameStateStack();
         AssetStorage = new AssetStorage();
 
-        BackgroundPalette = new Palette();
-        ForegroundPalette = new Palette(); 
-        BackgroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
-        ForegroundBitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
+        Palette = new Palette(); 
+        Bitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
 
 
-        ForegroundPalette[0, 0] = Color.Transparent;
-        ForegroundPalette[1, 0] = Color.Red;
-        ForegroundPalette[2, 0] = Color.Green;
-        ForegroundPalette[3, 0] = Color.Yellow;
+        Palette[0, 0] = Color.Transparent;
+        Palette[1, 0] = Color.Red;
+        Palette[2, 0] = Color.Green;
+        Palette[3, 0] = Color.Yellow;
 
-        ForegroundPalette[31, 0] = Color.White; ForegroundPalette[31, 1] = Color.Moccasin; ForegroundPalette[31, 2] = Color.SandyBrown;
+        Palette[19, 0] = Color.MediumPurple;
+        Palette[20, 0] = Color.Purple;
+        Palette[21, 0] = Color.Black;
+
+        Palette[31, 0] = Color.White; Palette[31, 1] = Color.Moccasin; Palette[31, 2] = Color.SandyBrown;
     }
 
     public void Start()
@@ -159,8 +159,7 @@ internal sealed class GameEngine : IDisposable
 
         var frameProgress = _accumulatedTime / _tickDuration;
 
-        BackgroundBitmap.Clear();
-        ForegroundBitmap.Clear();
+        Bitmap.Clear();
 
         var currentGameStatesCopy = GameStates.Copy();
         foreach (var state in currentGameStatesCopy)
@@ -193,8 +192,7 @@ internal sealed class GameEngine : IDisposable
         _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
         _windowRenderer.Clear();
 
-        _presentingRenderer.BlitPaletteIndexBitmap(BackgroundBitmap, 0, 0, BackgroundPalette);
-        _presentingRenderer.BlitPaletteIndexBitmap(ForegroundBitmap, 0, 0, ForegroundPalette);
+        _presentingRenderer.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette);
         _presentingRenderer.Present();
 
         if (Surface.LockTexture(_windowTexture, nint.Zero, out var windowTextureSurface))

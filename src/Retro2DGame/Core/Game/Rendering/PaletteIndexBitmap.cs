@@ -14,12 +14,12 @@ internal sealed class PaletteIndexBitmap
 
     public const int TRANSPARENCY_SHADE = 0;
 
-    public uint Width { get; }
-    public uint Height { get; }
+    public int Width { get; }
+    public int Height { get; }
 
     private readonly byte[] _paletteIndexes;
 
-    private PaletteIndexBitmap(uint width, uint height)
+    private PaletteIndexBitmap(int width, int height)
     {
         Width = width;
         Height = height;
@@ -27,7 +27,7 @@ internal sealed class PaletteIndexBitmap
         _paletteIndexes = new byte[width * height];
     }
 
-    public static PaletteIndexBitmap CreateEmpty(uint width, uint height)
+    public static PaletteIndexBitmap CreateEmpty(int width, int height)
     {
         var bitmap = new PaletteIndexBitmap(width, height);
 
@@ -41,11 +41,11 @@ internal sealed class PaletteIndexBitmap
         SDL.ReadU32BE(file, out var imageWidth);
         SDL.ReadU32BE(file, out var imageHeight);
 
-        var bitmap = CreateEmpty(imageWidth, imageHeight);
+        var bitmap = CreateEmpty((int)imageWidth, (int)imageHeight);
 
-        for (uint h = 0; h < imageHeight; h++)
+        for (int h = 0; h < imageHeight; h++)
         {
-            for (uint w = 0; w < imageWidth; w++)
+            for (int w = 0; w < imageWidth; w++)
             {
                 SDL.ReadU8(file, out var rawPaletteIndex);
                 bitmap.WriteIndex(rawPaletteIndex, w, h);
@@ -57,22 +57,22 @@ internal sealed class PaletteIndexBitmap
         return bitmap;
     }
 
-    public int ReadIndex(uint positionX, uint positionY)
+    public int ReadIndex(int positionX, int positionY)
     {
         return _paletteIndexes[positionX + positionY * Width];
     }
 
-    public void WriteIndex(int index, uint positionX, uint positionY)
+    public void WriteIndex(int index, int positionX, int positionY)
     {
         _paletteIndexes[positionX + positionY * Width] = (byte)index;
     }
 
-    public int ReadShade(uint positionX, uint positionY)
+    public int ReadShade(int positionX, int positionY)
     {
         return _paletteIndexes[positionX + positionY * Width] & SHADE_BITS_MASK;
     }
 
-    public void WriteShade(int shade, uint positionX, uint positionY)
+    public void WriteShade(int shade, int positionX, int positionY)
     {
         var shadeConverted = (byte)(shade & SHADE_BITS_MASK);
 
@@ -80,12 +80,12 @@ internal sealed class PaletteIndexBitmap
         _paletteIndexes[positionX + positionY * Width] |= shadeConverted;
     }
 
-    public int ReadContext(uint positionX, uint positionY)
+    public int ReadContext(int positionX, int positionY)
     {
         return (_paletteIndexes[positionX + positionY * Width] & CONTEXT_BITS_MASK) >> SHADE_LENGTH_BITS;
     }
 
-    public void WriteContext(int context, uint positionX, uint positionY)
+    public void WriteContext(int context, int positionX, int positionY)
     {
         var contextConverted = (byte)((context & CONTEXT_BITS_MASK) << SHADE_LENGTH_BITS);
 
@@ -96,19 +96,19 @@ internal sealed class PaletteIndexBitmap
     public void Blit
     (
         PaletteIndexBitmap source,
-        uint destinationPositionX, uint destinationPositionY,
-        uint sourcePositionX = 0, uint sourcePositionY = 0,
-        uint width = 0, uint height = 0,
+        int destinationPositionX, int destinationPositionY,
+        int sourcePositionX = 0, int sourcePositionY = 0,
+        int width = 0, int height = 0,
         bool ignoreTransparency = true
     )
     {
-        if (width == 0)
+        if (width <= 0)
             width = source.Width;
-        if (height == 0)
+        if (height <= 0)
             height = source.Height;
-        for (uint h = 0; h < height; h++)
+        for (int h = 0; h < height; h++)
         {
-            for (uint w = 0; w < width; w++)
+            for (int w = 0; w < width; w++)
             {
                 var samplePositionX = sourcePositionX + w;
                 var samplePositionY = sourcePositionY + h;
@@ -138,12 +138,12 @@ internal sealed class PaletteIndexBitmap
     public void Blit
     (
         PaletteIndexBitmap source,
-        uint destinationPositionX, uint destinationPositionY,
+        int destinationPositionX, int destinationPositionY,
         Rectangle sourceRectangle,
         bool ignoreTransparency = true
     )
     {
-        Blit(source, destinationPositionX, destinationPositionY, (uint)sourceRectangle.X, (uint)sourceRectangle.Y, (uint)sourceRectangle.Width, (uint)sourceRectangle.Height, ignoreTransparency);
+        Blit(source, destinationPositionX, destinationPositionY, sourceRectangle.X, sourceRectangle.Y, sourceRectangle.Width, sourceRectangle.Height, ignoreTransparency);
     }
 
     public void Clear()
@@ -162,9 +162,9 @@ internal static class RendererBitmapExtension
         bool ignoreTransparency = true
     )
     {
-        for (uint h = 0; h < bitmap.Height; h++)
+        for (var h = 0; h < bitmap.Height; h++)
         {
-            for (uint w = 0; w < bitmap.Width; w++)
+            for (var w = 0; w < bitmap.Width; w++)
             {
                 var shade = bitmap.ReadShade(w, h);
                 if (shade == PaletteIndexBitmap.TRANSPARENCY_SHADE && ignoreTransparency)

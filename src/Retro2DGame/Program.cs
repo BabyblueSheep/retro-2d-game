@@ -1,10 +1,6 @@
-using Retro2DGame.Content.GameStates;
-using Retro2DGame.Core;
+using Retro2DGame.Content.GameStates.MenuStates;
 using Retro2DGame.Core.Game;
-using Retro2DGame.Core.Game.Rendering;
-using Retro2DGame.Core.SDL3;
 using SDL3;
-using System.Drawing;
 
 namespace Retro2DGame;
 
@@ -31,7 +27,8 @@ internal sealed class Program
 		const int MAX_UPDATES_PER_TICK = 6;
         var gameEngine = new GameEngine(TimeSpan.FromSeconds(1.0 / TICKS_PER_SECOND), MAX_UPDATES_PER_TICK);
 
-        gameEngine.GameStates.Push(new MainMenuState(gameEngine));
+        gameEngine.GameStates.Push(new MainMenuBackgroundState(gameEngine));
+        gameEngine.GameStates.Push(new MainMenuMainState(gameEngine));
 
         gameEngine.Start();
         while (!gameEngine.HasRequestedToDie)

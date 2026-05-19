@@ -33,10 +33,10 @@ internal abstract class UIButton
         }
     }
 
-    public RectangleF OriginalBoundingBox { get; set; }
+    public RectangleF Dimensions { get; set; }
     public Vector2 Margin { get; set; }
 
-    public RectangleF BoundingBox => OriginalBoundingBox.Inflated(Margin.X, Margin.Y);
+    public RectangleF BoundingBox => Dimensions.Inflated(Margin.X, Margin.Y);
 
     public Action<UIButton> OnStateChange { get; }
 
@@ -66,9 +66,11 @@ internal sealed class UITextButton : UIButton
         set
         {
             _text = value;
-            OriginalBoundingBox = new RectangleF(OriginalBoundingBox.X, OriginalBoundingBox.Y, TextRenderer.GetTextWidth(_text), TextRenderer.GetTextHeight());
+            Dimensions = new RectangleF(Dimensions.X, Dimensions.Y, TextRenderer.GetTextWidth(_text), TextRenderer.GetTextHeight());
         }
     }
+
+    public TextRenderer.TextAlignment TextAlignment { get; set; } = TextRenderer.TextAlignment.Left;
 
     public UITextButton(Action<UIButton> onStateChange) : base(onStateChange)
     {
@@ -80,13 +82,23 @@ internal sealed class UITextButton : UIButton
         var textToRender = Text;
         if (State == ButtonState.Highlighted)
         {
-            textToRender = string.Concat("{", Text, "}");
+            textToRender = string.Concat("*", Text, "*");
         }
         if (State == ButtonState.Held)
         {
-            textToRender = string.Concat("{{", Text, "}}");
+            textToRender = string.Concat("#", Text, "#");
         }
 
-        TextRenderer.BlitText(assets, destination, (uint)OriginalBoundingBox.X, (uint)OriginalBoundingBox.Y, textToRender);
+        var positionToRenderX = (int)Dimensions.Left;
+        if (TextAlignment == TextRenderer.TextAlignment.Right)
+        {
+            positionToRenderX = (int)Dimensions.Right;
+        }
+        if (TextAlignment == TextRenderer.TextAlignment.Center)
+        {
+            positionToRenderX = (int)(Dimensions.Left + Dimensions.Right) / 2;
+        }
+
+        TextRenderer.BlitText(assets, destination, positionToRenderX, (int)Dimensions.Y, textToRender, TextAlignment);
     }
 }

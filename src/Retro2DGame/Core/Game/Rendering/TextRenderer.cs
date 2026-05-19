@@ -1,60 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace Retro2DGame.Core.Game.Rendering;
 
 internal sealed class TextRenderer
 {
+    public enum TextAlignment
+    {
+        Left,
+        Center,
+        Right
+    }
+
     private static PaletteIndexBitmap GetTextDefaultSprite(AssetStorage assets, char character)
     {
         return character switch
         {
-            '0' => assets.TextDefault0,
-            '1' => assets.TextDefault1,
-            '2' => assets.TextDefault2,
-            '3' => assets.TextDefault3,
-            '4' => assets.TextDefault4,
-            '5' => assets.TextDefault5,
-            '6' => assets.TextDefault6,
-            '7' => assets.TextDefault7,
-            '8' => assets.TextDefault8,
-            '9' => assets.TextDefault9,
+            '0' => assets.TextDefault.Zero,
+            '1' => assets.TextDefault.One,
+            '2' => assets.TextDefault.Two,
+            '3' => assets.TextDefault.Three,
+            '4' => assets.TextDefault.Four,
+            '5' => assets.TextDefault.Five,
+            '6' => assets.TextDefault.Six,
+            '7' => assets.TextDefault.Seven,
+            '8' => assets.TextDefault.Eight,
+            '9' => assets.TextDefault.Nine,
 
-            'A' => assets.TextDefaultA,
-            'B' => assets.TextDefaultB,
-            'C' => assets.TextDefaultC,
-            'D' => assets.TextDefaultD,
-            'E' => assets.TextDefaultE,
-            'F' => assets.TextDefaultF,
-            'G' => assets.TextDefaultG,
-            'H' => assets.TextDefaultH,
-            'I' => assets.TextDefaultI,
-            'J' => assets.TextDefaultJ,
-            'K' => assets.TextDefaultK,
-            'L' => assets.TextDefaultL,
-            'M' => assets.TextDefaultM,
-            'N' => assets.TextDefaultN,
-            'O' => assets.TextDefaultO,
-            'P' => assets.TextDefaultP,
-            'Q' => assets.TextDefaultQ,
-            'R' => assets.TextDefaultR,
-            'S' => assets.TextDefaultS,
-            'T' => assets.TextDefaultT,
-            'U' => assets.TextDefaultU,
-            'V' => assets.TextDefaultV,
-            'W' => assets.TextDefaultW,
-            'X' => assets.TextDefaultX,
-            'Y' => assets.TextDefaultY,
-            'Z' => assets.TextDefaultZ,
+            'A' => assets.TextDefault.A,
+            'B' => assets.TextDefault.B,
+            'C' => assets.TextDefault.C,
+            'D' => assets.TextDefault.D,
+            'E' => assets.TextDefault.E,
+            'F' => assets.TextDefault.F,
+            'G' => assets.TextDefault.G,
+            'H' => assets.TextDefault.H,
+            'I' => assets.TextDefault.I,
+            'J' => assets.TextDefault.J,
+            'K' => assets.TextDefault.K,
+            'L' => assets.TextDefault.L,
+            'M' => assets.TextDefault.M,
+            'N' => assets.TextDefault.N,
+            'O' => assets.TextDefault.O,
+            'P' => assets.TextDefault.P,
+            'Q' => assets.TextDefault.Q,
+            'R' => assets.TextDefault.R,
+            'S' => assets.TextDefault.S,
+            'T' => assets.TextDefault.T,
+            'U' => assets.TextDefault.U,
+            'V' => assets.TextDefault.V,
+            'W' => assets.TextDefault.W,
+            'X' => assets.TextDefault.X,
+            'Y' => assets.TextDefault.Y,
+            'Z' => assets.TextDefault.Z,
 
-            '.' => assets.TextDefaultPeriod,
-            ',' => assets.TextDefaultComma,
-            '!' => assets.TextDefaultExclamationMark,
-            '?' => assets.TextDefaultQuestionMark,
-            '-' => assets.TextDefaultHyphen,
+            '.' => assets.TextDefault.Period,
+            ',' => assets.TextDefault.Comma,
+            '!' => assets.TextDefault.ExclamationMark,
+            '?' => assets.TextDefault.QuestionMark,
+            '-' => assets.TextDefault.Hyphen,
 
-            _ => assets.TextHighlightedQuestionMark,
+            _ => assets.TextDefault.QuestionMark,
         };
     }
 
@@ -62,51 +70,51 @@ internal sealed class TextRenderer
     {
         return character switch
         {
-            '0' => assets.TextHighlighted0,
-            '1' => assets.TextHighlighted1,
-            '2' => assets.TextHighlighted2,
-            '3' => assets.TextHighlighted3,
-            '4' => assets.TextHighlighted4,
-            '5' => assets.TextHighlighted5,
-            '6' => assets.TextHighlighted6,
-            '7' => assets.TextHighlighted7,
-            '8' => assets.TextHighlighted8,
-            '9' => assets.TextHighlighted9,
+            '0' => assets.TextHighlighted.Zero,
+            '1' => assets.TextHighlighted.One,
+            '2' => assets.TextHighlighted.Two,
+            '3' => assets.TextHighlighted.Three,
+            '4' => assets.TextHighlighted.Four,
+            '5' => assets.TextHighlighted.Five,
+            '6' => assets.TextHighlighted.Six,
+            '7' => assets.TextHighlighted.Seven,
+            '8' => assets.TextHighlighted.Eight,
+            '9' => assets.TextHighlighted.Nine,
 
-            'A' => assets.TextHighlightedA,
-            'B' => assets.TextHighlightedB,
-            'C' => assets.TextHighlightedC,
-            'D' => assets.TextHighlightedD,
-            'E' => assets.TextHighlightedE,
-            'F' => assets.TextHighlightedF,
-            'G' => assets.TextHighlightedG,
-            'H' => assets.TextHighlightedH,
-            'I' => assets.TextHighlightedI,
-            'J' => assets.TextHighlightedJ,
-            'K' => assets.TextHighlightedK,
-            'L' => assets.TextHighlightedL,
-            'M' => assets.TextHighlightedM,
-            'N' => assets.TextHighlightedN,
-            'O' => assets.TextHighlightedO,
-            'P' => assets.TextHighlightedP,
-            'Q' => assets.TextHighlightedQ,
-            'R' => assets.TextHighlightedR,
-            'S' => assets.TextHighlightedS,
-            'T' => assets.TextHighlightedT,
-            'U' => assets.TextHighlightedU,
-            'V' => assets.TextHighlightedV,
-            'W' => assets.TextHighlightedW,
-            'X' => assets.TextHighlightedX,
-            'Y' => assets.TextHighlightedY,
-            'Z' => assets.TextHighlightedZ,
+            'A' => assets.TextHighlighted.A,
+            'B' => assets.TextHighlighted.B,
+            'C' => assets.TextHighlighted.C,
+            'D' => assets.TextHighlighted.D,
+            'E' => assets.TextHighlighted.E,
+            'F' => assets.TextHighlighted.F,
+            'G' => assets.TextHighlighted.G,
+            'H' => assets.TextHighlighted.H,
+            'I' => assets.TextHighlighted.I,
+            'J' => assets.TextHighlighted.J,
+            'K' => assets.TextHighlighted.K,
+            'L' => assets.TextHighlighted.L,
+            'M' => assets.TextHighlighted.M,
+            'N' => assets.TextHighlighted.N,
+            'O' => assets.TextHighlighted.O,
+            'P' => assets.TextHighlighted.P,
+            'Q' => assets.TextHighlighted.Q,
+            'R' => assets.TextHighlighted.R,
+            'S' => assets.TextHighlighted.S,
+            'T' => assets.TextHighlighted.T,
+            'U' => assets.TextHighlighted.U,
+            'V' => assets.TextHighlighted.V,
+            'W' => assets.TextHighlighted.W,
+            'X' => assets.TextHighlighted.X,
+            'Y' => assets.TextHighlighted.Y,
+            'Z' => assets.TextHighlighted.Z,
 
-            '.' => assets.TextHighlightedPeriod,
-            ',' => assets.TextHighlightedComma,
-            '!' => assets.TextHighlightedExclamationMark,
-            '?' => assets.TextHighlightedQuestionMark,
-            '-' => assets.TextHighlightedHyphen,
+            '.' => assets.TextHighlighted.Period,
+            ',' => assets.TextHighlighted.Comma,
+            '!' => assets.TextHighlighted.ExclamationMark,
+            '?' => assets.TextHighlighted.QuestionMark,
+            '-' => assets.TextHighlighted.Hyphen,
 
-            _ => assets.TextHighlightedQuestionMark,
+            _ => assets.TextHighlighted.QuestionMark,
         };
     }
 
@@ -114,65 +122,85 @@ internal sealed class TextRenderer
     {
         return character switch
         {
-            '0' => assets.TextPressed0,
-            '1' => assets.TextPressed1,
-            '2' => assets.TextPressed2,
-            '3' => assets.TextPressed3,
-            '4' => assets.TextPressed4,
-            '5' => assets.TextPressed5,
-            '6' => assets.TextPressed6,
-            '7' => assets.TextPressed7,
-            '8' => assets.TextPressed8,
-            '9' => assets.TextPressed9,
+            '0' => assets.TextPressed.Zero,
+            '1' => assets.TextPressed.One,
+            '2' => assets.TextPressed.Two,
+            '3' => assets.TextPressed.Three,
+            '4' => assets.TextPressed.Four,
+            '5' => assets.TextPressed.Five,
+            '6' => assets.TextPressed.Six,
+            '7' => assets.TextPressed.Seven,
+            '8' => assets.TextPressed.Eight,
+            '9' => assets.TextPressed.Nine,
 
-            'A' => assets.TextPressedA,
-            'B' => assets.TextPressedB,
-            'C' => assets.TextPressedC,
-            'D' => assets.TextPressedD,
-            'E' => assets.TextPressedE,
-            'F' => assets.TextPressedF,
-            'G' => assets.TextPressedG,
-            'H' => assets.TextPressedH,
-            'I' => assets.TextPressedI,
-            'J' => assets.TextPressedJ,
-            'K' => assets.TextPressedK,
-            'L' => assets.TextPressedL,
-            'M' => assets.TextPressedM,
-            'N' => assets.TextPressedN,
-            'O' => assets.TextPressedO,
-            'P' => assets.TextPressedP,
-            'Q' => assets.TextPressedQ,
-            'R' => assets.TextPressedR,
-            'S' => assets.TextPressedS,
-            'T' => assets.TextPressedT,
-            'U' => assets.TextPressedU,
-            'V' => assets.TextPressedV,
-            'W' => assets.TextPressedW,
-            'X' => assets.TextPressedX,
-            'Y' => assets.TextPressedY,
-            'Z' => assets.TextPressedZ,
+            'A' => assets.TextPressed.A,
+            'B' => assets.TextPressed.B,
+            'C' => assets.TextPressed.C,
+            'D' => assets.TextPressed.D,
+            'E' => assets.TextPressed.E,
+            'F' => assets.TextPressed.F,
+            'G' => assets.TextPressed.G,
+            'H' => assets.TextPressed.H,
+            'I' => assets.TextPressed.I,
+            'J' => assets.TextPressed.J,
+            'K' => assets.TextPressed.K,
+            'L' => assets.TextPressed.L,
+            'M' => assets.TextPressed.M,
+            'N' => assets.TextPressed.N,
+            'O' => assets.TextPressed.O,
+            'P' => assets.TextPressed.P,
+            'Q' => assets.TextPressed.Q,
+            'R' => assets.TextPressed.R,
+            'S' => assets.TextPressed.S,
+            'T' => assets.TextPressed.T,
+            'U' => assets.TextPressed.U,
+            'V' => assets.TextPressed.V,
+            'W' => assets.TextPressed.W,
+            'X' => assets.TextPressed.X,
+            'Y' => assets.TextPressed.Y,
+            'Z' => assets.TextPressed.Z,
 
-            '.' => assets.TextPressedPeriod,
-            ',' => assets.TextPressedComma,
-            '!' => assets.TextPressedExclamationMark,
-            '?' => assets.TextPressedQuestionMark,
-            '-' => assets.TextPressedHyphen,
+            '.' => assets.TextPressed.Period,
+            ',' => assets.TextPressed.Comma,
+            '!' => assets.TextPressed.ExclamationMark,
+            '?' => assets.TextPressed.QuestionMark,
+            '-' => assets.TextPressed.Hyphen,
 
-            _ => assets.TextPressedQuestionMark,
+            _ => assets.TextPressed.QuestionMark,
         };
     }
 
     public static void BlitText
     (
         AssetStorage assets, PaletteIndexBitmap destination,
-        uint destinationPositionX, uint destinationPositionY,
-        string text
+        int destinationPositionX, int destinationPositionY,
+        string text,
+        TextAlignment textAlignment = TextAlignment.Left
     )
     {
+        int startingPositionX = destinationPositionX;
+        int offsetAmount = 8;
+        if (textAlignment == TextAlignment.Right)
+        {
+            var reversedText = "";
+            for (int i = text.Length - 1; i >= 0; i--)
+            {
+                reversedText += text[i];
+            }
+            text = reversedText;
+
+            offsetAmount = -8;
+        }
+        if (textAlignment == TextAlignment.Center)
+        {
+            startingPositionX = destinationPositionX - GetTextWidth(text) / 2;
+        }
+
         text = text.ToUpper();
 
-        uint offset = 0;
-        var textColor = 0;
+        var offset = 0;
+        var isTextHighlighted = false;
+        var isTextSuperHighlighted = false;
         foreach (var character in text)
         {
             if (character == ' ')
@@ -180,31 +208,46 @@ internal sealed class TextRenderer
                 offset++;
                 continue;
             }
-            if (character == '{')
+            if (character == '*')
             {
-                textColor++;
+                isTextHighlighted = !isTextHighlighted;
                 continue;
             }
-            if (character == '}')
+            if (character == '#')
             {
-                textColor--;
+                isTextSuperHighlighted = !isTextSuperHighlighted;
                 continue;
             }
 
             var characterSprite = GetTextDefaultSprite(assets, character);
-            if (textColor == 1)
+            if (isTextHighlighted)
                 characterSprite = GetTextHighlightedSprite(assets, character);
-            if (textColor == 2)
+            if (isTextSuperHighlighted)
                 characterSprite = GetTextPressedSprite(assets, character);
 
-            destination.Blit(characterSprite, destinationPositionX + offset * 8, destinationPositionY);
+            destination.Blit(characterSprite, startingPositionX + offset * offsetAmount, destinationPositionY);
             offset++;
         }
     }
 
     public static int GetTextWidth(string text)
     {
-        return text.Length * 8;
+        var characterAmount = 0;
+        foreach (var character in text)
+        {
+            if (character == '*')
+            {
+                continue;
+            }
+            if (character == '#')
+            {
+                continue;
+            }
+
+            characterAmount++;
+        }
+
+        return characterAmount * 8;
     }
 
     public static int GetTextHeight()

@@ -8,55 +8,77 @@ using SDL3;
 using System.Drawing;
 using System.Numerics;
 
-namespace Retro2DGame.Content.GameStates;
+namespace Retro2DGame.Content.GameStates.MenuStates;
 
-internal sealed class MainMenuState : GameState
+internal sealed class MainMenuMainState : GameState
 {
     private readonly UIButtonGroup _buttonGroup;
 
-    public MainMenuState(GameEngine engine) : base(engine)
+    public MainMenuMainState(GameEngine engine) : base(engine)
     {
         _buttonGroup = new UIButtonGroup
         (
             new UITextButton(
                 (UIButton button) =>
                 {
-                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                         SDL.LogInfo(SDL.LogCategory.Application, "Play");
                 }
             )
             {
-                OriginalBoundingBox = new RectangleF(176, 192, 1, 1),
                 Text = "Play",
-                Margin = new Vector2(4, 4)
+                Dimensions = new RectangleF(176, 192, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
+                Margin = new Vector2(4, 4),
+                TextAlignment = TextRenderer.TextAlignment.Right,
             },
 
             new UITextButton(
                 (UIButton button) =>
                 {
-                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
+                    {
                         SDL.LogInfo(SDL.LogCategory.Application, "Settings");
+
+                        GameEngine.GameStates.Pop();
+                        GameEngine.GameStates.Push(new MainMenuSettingsState(GameEngine));
+                    }
                 }
             )
             {
-                OriginalBoundingBox = new RectangleF(176, 208, 1, 1),
                 Text = "Settings",
-                Margin = new Vector2(4, 4)
+                Dimensions = new RectangleF(176, 208, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
+                Margin = new Vector2(4, 4),
+                TextAlignment = TextRenderer.TextAlignment.Right,
             },
 
             new UITextButton(
                 (UIButton button) =>
                 {
-                    if (button.State == UIButton.ButtonState.Held && button.PreviousState == UIButton.ButtonState.Highlighted && !_buttonGroup!.HasAnyButtonBeenPressedThisMousePress)
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
+                    {
                         SDL.LogInfo(SDL.LogCategory.Application, "Quit");
+
+                        GameEngine.RequestToDie();
+                    }
                 }
             )
             {
-                OriginalBoundingBox = new RectangleF(176, 224, 1, 1),
                 Text = "Quit",
-                Margin = new Vector2(4, 4)
+                Dimensions = new RectangleF(176, 224, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
+                Margin = new Vector2(4, 4),
+                TextAlignment = TextRenderer.TextAlignment.Right,
             }
         );
+    }
+
+    public override void Enter()
+    {
+
+    }
+
+    public override void Exit()
+    {
+
     }
 
     public override void Update(TimeSpan delta)
@@ -74,7 +96,7 @@ internal sealed class MainMenuState : GameState
 
         _buttonGroup.ProcessButtons
         (
-            GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm),
+            GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm), GameEngine.Inputs.WasDown(InputButtonType.MenuConfirm),
             GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown,
             GameEngine.Inputs.PreviousMousePosition, GameEngine.Inputs.WasMouseLeftClickDown
         );
@@ -104,7 +126,7 @@ internal sealed class MainMenuState : GameState
 
     public override void Render(double progress)
     {
-        _buttonGroup.Render(GameEngine.AssetStorage, GameEngine.ForegroundBitmap);
+        _buttonGroup.Render(GameEngine.AssetStorage, GameEngine.Bitmap);
     }
 
     protected override void Dispose(bool disposing)
