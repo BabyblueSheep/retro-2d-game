@@ -22,30 +22,14 @@ internal sealed class MainMenuMainState : GameState
                 (UIButton button) =>
                 {
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
-                        SDL.LogInfo(SDL.LogCategory.Application, "Play");
-                }
-            )
-            {
-                Text = "Play",
-                Dimensions = new RectangleF(176, 192, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
-                Margin = new Vector2(4, 4),
-                TextAlignment = TextRenderer.TextAlignment.Right,
-            },
-
-            new UITextButton(
-                (UIButton button) =>
-                {
-                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
-                        SDL.LogInfo(SDL.LogCategory.Application, "Settings");
-
                         GameEngine.GameStates.Pop();
-                        GameEngine.GameStates.Push(new MainMenuSettingsState(GameEngine));
+                        GameEngine.GameStates.Push(new MainMenuLevelSelectState(GameEngine));
                     }
                 }
             )
             {
-                Text = "Settings",
+                Text = "Play",
                 Dimensions = new RectangleF(176, 208, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
                 Margin = new Vector2(4, 4),
                 TextAlignment = TextRenderer.TextAlignment.Right,
@@ -56,15 +40,30 @@ internal sealed class MainMenuMainState : GameState
                 {
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
-                        SDL.LogInfo(SDL.LogCategory.Application, "Quit");
+                        GameEngine.GameStates.Pop();
+                        GameEngine.GameStates.Push(new MainMenuSettingsState(GameEngine));
+                    }
+                }
+            )
+            {
+                Text = "Settings",
+                Dimensions = new RectangleF(176, 224, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
+                Margin = new Vector2(4, 4),
+                TextAlignment = TextRenderer.TextAlignment.Right,
+            },
 
+            new UITextButton(
+                (UIButton button) =>
+                {
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
+                    {
                         GameEngine.RequestToDie();
                     }
                 }
             )
             {
                 Text = "Quit",
-                Dimensions = new RectangleF(176, 224, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
+                Dimensions = new RectangleF(176, 240, TextRenderer.GetTextWidth("Settings"), TextRenderer.GetTextHeight()),
                 Margin = new Vector2(4, 4),
                 TextAlignment = TextRenderer.TextAlignment.Right,
             }
@@ -85,12 +84,13 @@ internal sealed class MainMenuMainState : GameState
     {
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
         {
-            _buttonGroup.DecrementSelectedIndex();
+            _buttonGroup.SelectedIndex--;
         }
         if (GameEngine.Inputs.IsDown(InputButtonType.MenuDown) && !GameEngine.Inputs.WasDown(InputButtonType.MenuDown))
         {
-            _buttonGroup.IncrementSelectedIndex();
+            _buttonGroup.SelectedIndex++;
         }
+        _buttonGroup.SelectedIndex = int.Wrap(_buttonGroup.SelectedIndex, 3);
 
         _buttonGroup.PropagateState();
 
@@ -100,23 +100,6 @@ internal sealed class MainMenuMainState : GameState
             GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown,
             GameEngine.Inputs.PreviousMousePosition, GameEngine.Inputs.WasMouseLeftClickDown
         );
-
-        /*if (GameEngine.Inputs.IsDown(InputButtonType.MenuConfirm))
-        {
-            switch (_selectedOption)
-            {
-                case 0:
-                    GameEngine.GameStates.Pop();
-                    GameEngine.GameStates.Push(new GameplayState(GameEngine));
-                    break;
-                case 1:
-                    GameEngine.GameStates.Push(new MainMenuSettingsState(GameEngine));
-                    break;
-                case 2:
-                    GameEngine.RequestToDie();
-                    break;
-            }
-        }*/
     }
 
     public override void FixedUpdate(TimeSpan delta)

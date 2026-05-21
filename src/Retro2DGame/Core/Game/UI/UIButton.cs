@@ -96,7 +96,7 @@ internal sealed class UITextButton : UIButton
         }
         if (TextAlignment == TextRenderer.TextAlignment.Center)
         {
-            positionToRenderX = (int)(Dimensions.Left + Dimensions.Right) / 2;
+            positionToRenderX = ((int)Dimensions.Left + (int)Dimensions.Right) / 2;
         }
 
         TextRenderer.BlitText(assets, destination, positionToRenderX, (int)Dimensions.Y, textToRender, TextAlignment);

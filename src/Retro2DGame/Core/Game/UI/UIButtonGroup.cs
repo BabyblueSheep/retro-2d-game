@@ -7,33 +7,21 @@ internal sealed class UIButtonGroup
 {
     private readonly UIButton[] _buttons;
 
-    private int _currentlySelectedIndex;
+    public int SelectedIndex { get; set; }
 
     public UIButtonGroup(params UIButton[] buttons)
     {
         _buttons = buttons;
-        _currentlySelectedIndex = 0;
+        SelectedIndex = 0;
     }
 
-    private void WrapSelectedIndex()
+    public void WrapSelectedIndex()
     {
-        while (_currentlySelectedIndex < 0)
+        while (SelectedIndex < 0)
         {
-            _currentlySelectedIndex += _buttons.Length;
+            SelectedIndex += _buttons.Length;
         }
-        _currentlySelectedIndex %= _buttons.Length;
-    }
-
-    public void IncrementSelectedIndex(int amount = 1)
-    {
-        _currentlySelectedIndex += amount;
-        WrapSelectedIndex();
-    }
-
-    public void DecrementSelectedIndex(int amount = 1)
-    {
-        _currentlySelectedIndex -= amount;
-        WrapSelectedIndex();
+        SelectedIndex %= _buttons.Length;
     }
 
     private void TryForceSelectedIndex(int index)
@@ -41,7 +29,7 @@ internal sealed class UIButtonGroup
         var button = _buttons[index];
         if (button.State != UIButton.ButtonState.Idle)
         {
-            _currentlySelectedIndex = index;
+            SelectedIndex = index;
         }
     }
 
@@ -80,7 +68,7 @@ internal sealed class UIButtonGroup
     {
         var button = _buttons[index];
 
-        if (index == _currentlySelectedIndex)
+        if (index == SelectedIndex)
         {
             button.State = (isManuallyPressing && (!wasManuallyPressing || button.PreviousState == UIButton.ButtonState.Held)) ? UIButton.ButtonState.Held : UIButton.ButtonState.Highlighted;
         }
