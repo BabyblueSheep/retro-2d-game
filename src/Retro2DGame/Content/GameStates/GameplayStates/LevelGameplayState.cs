@@ -34,17 +34,18 @@ internal sealed class LevelGameplayState : GameState
 
     public override void FixedUpdate(TimeSpan delta)
     {
-        _level.FixedUpdate(delta);
+        _level.FixedUpdateEntities(delta);
     }
 
     public override void Update(TimeSpan delta)
     {
-        _level.Update(delta);
+        _level.UpdateLanternPosition(GameEngine.Inputs, delta);
+        _level.UpdateEntities(delta);
     }
 
     public override void Render(double progress)
     {
-        _level.Render(GameEngine.AssetStorage, GameEngine.Bitmap, progress);
+        _level.RenderEntities(GameEngine.AssetStorage, GameEngine.Bitmap, progress);
     }
 
     protected override void Dispose(bool disposing)

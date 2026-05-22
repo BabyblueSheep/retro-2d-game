@@ -12,11 +12,11 @@ internal sealed class GameEngine : IDisposable
 {
     public const int DEFAULT_WINDOW_WIDTH = 256 * 2;
     public const int DEFAULT_WINDOW_HEIGHT = 256 * 2;
-    public readonly Vector2 DEFAULT_WINDOW_SIZE = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+    public static readonly Vector2 DEFAULT_WINDOW_SIZE = new Vector2(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
     public const int GAME_WIDTH = 256;
     public const int GAME_HEIGHT = 256;
-    public readonly Vector2 GAME_SIZE = new Vector2(GAME_WIDTH, GAME_HEIGHT);
+    public static readonly Vector2 GAME_SIZE = new Vector2(GAME_WIDTH, GAME_HEIGHT);
 
     private readonly Stopwatch _timeTracker;
     private TimeSpan _previousElapsedTime;
@@ -82,6 +82,10 @@ internal sealed class GameEngine : IDisposable
         Palette[5, 0] = Color.White;
         Palette[6, 0] = Color.Pink;
         Palette[7, 0] = Color.Blue;
+
+        Palette[16, 0] = Color.White;
+        Palette[17, 0] = Color.Orange;
+        Palette[18, 0] = Color.Red;
 
         Palette[19, 0] = Color.MediumPurple;
         Palette[20, 0] = Color.Purple;

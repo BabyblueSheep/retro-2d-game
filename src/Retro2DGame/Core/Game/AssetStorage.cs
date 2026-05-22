@@ -46,6 +46,8 @@ internal sealed class AssetStorage
         [SpriteFrame("player", [1, 0], [16, 16])] public PaletteIndexBitmap Move1 { get; private set; }
         [SpriteFrame("player", [1, 1], [16, 16])] public PaletteIndexBitmap Move2 { get; private set; }
         [SpriteFrame("player", [1, 2], [16, 16])] public PaletteIndexBitmap Move3 { get; private set; }
+
+        [SpriteFrame("lantern", [0, 0], [16, 16])] public PaletteIndexBitmap Lantern { get; private set; }
     }
     public PlayerAssetsStorage Player { get; } = new PlayerAssetsStorage();
 
@@ -214,6 +216,7 @@ internal sealed class AssetStorage
         {
             ["generic_background"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\generic_background.ptid"),
             ["player"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\player.ptid"),
+            ["lantern"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\lantern.ptid"),
             ["enemies"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\enemies.ptid"),
             ["text_default"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\text_default.ptid"),
             ["text_highlighted"] = PaletteIndexBitmap.CreateFromFile($"resources\\sprites\\generated\\text_highlighted.ptid"),

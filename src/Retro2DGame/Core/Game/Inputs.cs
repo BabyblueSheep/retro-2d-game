@@ -37,6 +37,10 @@ internal sealed class Inputs
     private Vector2 _previousMousePosition;
     public Vector2 MousePosition => _mousePosition;
     public Vector2 PreviousMousePosition => _previousMousePosition;
+    private Vector2 _mouseWindowPosition;
+    private Vector2 _previousMouseWindowPosition;
+    public Vector2 WindowMousePosition => _mouseWindowPosition;
+    public Vector2 WindowPreviousMousePosition => _previousMouseWindowPosition;
     public bool IsMouseLeftClickDown { get; private set; }
     public bool WasMouseLeftClickDown { get; private set; }
     public bool IsMouseRightClickDown { get; private set; }
@@ -78,6 +82,7 @@ internal sealed class Inputs
         WasMouseLeftClickDown = IsMouseLeftClickDown;
         WasMouseRightClickDown = IsMouseRightClickDown;
         _previousMousePosition = _mousePosition;
+        _previousMouseWindowPosition = _mouseWindowPosition;
 
         foreach (var inputButtonType in _buttonStates.Keys)
         {
@@ -113,6 +118,7 @@ internal sealed class Inputs
                 _mousePosition.X = @event.Motion.X;
                 _mousePosition.Y = @event.Motion.Y;
 
+                _mouseWindowPosition = _mousePosition;
                 _mousePosition = Vector2.RemapLetterboxed(_mousePosition, windowSize, gameSize);
 
                 break;
