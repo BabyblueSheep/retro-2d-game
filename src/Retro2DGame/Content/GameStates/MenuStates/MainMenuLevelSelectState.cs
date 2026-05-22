@@ -100,7 +100,7 @@ internal sealed class MainMenuLevelSelectState : GameState
             return;
 
         GameEngine.GameStates.Pop();
-        GameEngine.GameStates.Push(new GameplayState(GameEngine));
+        GameEngine.GameStates.Push(new LevelGameplayState(GameEngine));
     }
 
     public override void Update(TimeSpan delta)

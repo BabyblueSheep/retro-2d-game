@@ -74,9 +74,14 @@ internal sealed class GameEngine : IDisposable
 
 
         Palette[0, 0] = Color.Transparent;
+
         Palette[1, 0] = Color.Red;
         Palette[2, 0] = Color.Green;
         Palette[3, 0] = Color.Yellow;
+
+        Palette[5, 0] = Color.White;
+        Palette[6, 0] = Color.Pink;
+        Palette[7, 0] = Color.Blue;
 
         Palette[19, 0] = Color.MediumPurple;
         Palette[20, 0] = Color.Purple;

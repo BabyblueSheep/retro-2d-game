@@ -6,6 +6,9 @@
 		"player/player.png",
 		
 		
+		"enemies/enemies.png",
+		
+		
 		"text/text_default.png",
 		"text/text_highlighted.png",
 		"text/text_pressed.png"
