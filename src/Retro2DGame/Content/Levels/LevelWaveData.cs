@@ -7,7 +7,7 @@ namespace Retro2DGame.Content.Levels;
 
 internal sealed class LevelWaveData
 {
-    public (EntityType, float)[] AvailableEntityTypesCosts { get; private set; }
+    public (EntityID, float)[] AvailableEntityTypesCosts { get; private set; }
     public float TotalCost { get; private set; }
 
     public LevelWaveData()

@@ -75,23 +75,26 @@ internal sealed class GameEngine : IDisposable
 
         Palette[0, 0] = Color.Transparent;
 
-        Palette[1, 0] = Color.Red;
-        Palette[2, 0] = Color.Green;
-        Palette[3, 0] = Color.Yellow;
+        Palette[1, 0] = Color.Red; Palette[1, 1] = Color.DarkRed; Palette[1, 2] = Color.Black;
+        Palette[2, 0] = Color.Green; Palette[2, 1] = Color.DarkGreen; Palette[2, 2] = Color.Black;
+        Palette[3, 0] = Color.Yellow; Palette[3, 1] = Color.Red; Palette[3, 2] = Color.Black;
 
-        Palette[5, 0] = Color.White;
-        Palette[6, 0] = Color.Pink;
-        Palette[7, 0] = Color.Blue;
+        Palette[5, 0] = Color.White; Palette[5, 1] = Color.Gray; Palette[5, 2] = Color.Black;
+        Palette[6, 0] = Color.Pink; Palette[6, 1] = Color.Red; Palette[6, 2] = Color.Black;
+        Palette[7, 0] = Color.Blue; Palette[7, 1] = Color.DarkBlue; Palette[7, 2] = Color.Black;
 
-        Palette[16, 0] = Color.White;
-        Palette[17, 0] = Color.Orange;
-        Palette[18, 0] = Color.Red;
+        Palette[16, 0] = Color.White; Palette[16, 1] = Color.White; Palette[16, 2] = Color.White;
+        Palette[17, 0] = Color.Orange; Palette[17, 1] = Color.Orange; Palette[17, 2] = Color.Orange;
+        Palette[18, 0] = Color.Red; Palette[18, 1] = Color.Red; Palette[18, 2] = Color.Red;
 
-        Palette[19, 0] = Color.MediumPurple;
-        Palette[20, 0] = Color.Purple;
-        Palette[21, 0] = Color.Black;
+        Palette[19, 0] = Color.MediumPurple; Palette[19, 1] = Color.Purple; Palette[19, 2] = Color.Black;
+        Palette[20, 0] = Color.Purple; Palette[20, 1] = Color.Indigo; Palette[20, 2] = Color.Black;
+        Palette[21, 0] = Color.Indigo; Palette[21, 1] = Color.Black; Palette[21, 2] = Color.Black;
 
         Palette[31, 0] = Color.White; Palette[31, 1] = Color.Moccasin; Palette[31, 2] = Color.SandyBrown;
+
+        //public const byte SHADE_BITS_MASK = (1 << SHADE_LENGTH_BITS) - 1;
+        //public const byte CONTEXT_BITS_MASK = ((1 << CONTEXT_LENGTH_BITS) - 1) << SHADE_LENGTH_BITS;
     }
 
     public void Start()

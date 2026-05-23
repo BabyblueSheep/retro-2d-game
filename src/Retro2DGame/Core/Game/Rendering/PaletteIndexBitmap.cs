@@ -11,6 +11,7 @@ internal sealed class PaletteIndexBitmap
 
     public const byte SHADE_BITS_MASK = (1 << SHADE_LENGTH_BITS) - 1;
     public const byte CONTEXT_BITS_MASK = ((1 << CONTEXT_LENGTH_BITS) - 1) << SHADE_LENGTH_BITS;
+    public const byte CONTEXT_BITS_MASK_PRE_SHIFT = (1 << CONTEXT_LENGTH_BITS) - 1;
 
     public const int TRANSPARENCY_SHADE = 0;
 
@@ -87,7 +88,7 @@ internal sealed class PaletteIndexBitmap
 
     public void WriteContext(int context, int positionX, int positionY)
     {
-        var contextConverted = (byte)((context & CONTEXT_BITS_MASK) << SHADE_LENGTH_BITS);
+        var contextConverted = (byte)((context & CONTEXT_BITS_MASK_PRE_SHIFT) << SHADE_LENGTH_BITS);
 
         _paletteIndexes[positionX + positionY * Width] &= 255 ^ CONTEXT_BITS_MASK;
         _paletteIndexes[positionX + positionY * Width] |= contextConverted;

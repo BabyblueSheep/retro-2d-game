@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Retro2DGame.Content.Entities;
 
-internal enum EntityType
+internal enum EntityID
 {
     GhostGeneric,
     GhostTeleporting,
