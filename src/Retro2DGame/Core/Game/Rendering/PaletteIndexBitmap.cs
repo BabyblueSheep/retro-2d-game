@@ -1,6 +1,7 @@
 ﻿using Retro2DGame.Core.SDL3;
 using SDL3;
 using System.Drawing;
+using System.Reflection.Metadata;
 
 namespace Retro2DGame.Core.Game.Rendering;
 
@@ -175,6 +176,48 @@ internal static class RendererBitmapExtension
 
                 renderer.SetDrawColor(palette[shade, context]);
                 renderer.RenderPoint((int)(destinationX + w), (int)(destinationY + h));
+            }
+        }
+    }
+
+    public static void BlitPaletteIndexBitmap
+    (
+        this Surface surface, 
+        PaletteIndexBitmap bitmap,
+        int destinationX, int destinationY,
+        Palette palette,
+        Color? clearColor,
+        bool ignoreTransparency = true
+    )
+    {
+
+        var surfaceStruct = SDL.PointerToStructure<SDL.Surface>(surface.Handle);
+        if (!surfaceStruct.HasValue)
+            return;
+
+        var pitchPixels = surfaceStruct.Value.Pitch / sizeof(uint);
+
+        var pixels = SDL.PointerToStructureArray<uint>(surfaceStruct.Value.Pixels, pitchPixels * surfaceStruct.Value.Height);
+        if (pixels == null)
+            return;
+
+        for (var h = 0; h < bitmap.Height; h++)
+        {
+            for (var w = 0; w < bitmap.Width; w++)
+            {
+                if (clearColor != null)
+                {
+                    pixels[(destinationX + w) + (destinationY + h) * pitchPixels] = SDL.MapSurfaceRGBA(surface.Handle, clearColor.Value.R, clearColor.Value.G, clearColor.Value.B, clearColor.Value.A);
+                }
+
+                var shade = bitmap.ReadShade(w, h);
+                if (shade == PaletteIndexBitmap.TRANSPARENCY_SHADE && ignoreTransparency)
+                    continue;
+
+                var context = bitmap.ReadContext(w, h);
+                var color = palette[shade, context];
+
+                pixels[(destinationX + w) + (destinationY + h) * pitchPixels] = SDL.MapSurfaceRGBA(surface.Handle, color.R, color.G, color.B, color.A);
             }
         }
     }

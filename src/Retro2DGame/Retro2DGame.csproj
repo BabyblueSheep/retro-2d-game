@@ -20,9 +20,5 @@
 	  <PackageReference Include="SDL3-CS" Version="3.4.2" />
 	  <PackageReference Include="SDL3-CS.Native" Version="3.4.2" />
 	</ItemGroup>
-	
-	<ItemGroup>
-	  <Folder Include="Content\Entities\Components\RendererComponents\" />
-	</ItemGroup>
 
 </Project>

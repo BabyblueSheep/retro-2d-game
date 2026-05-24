@@ -1,11 +1,12 @@
 ﻿using Retro2DGame.Content.Entities;
-using Retro2DGame.Content.Entities.Systems;
 using Retro2DGame.Content.Levels;
 using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
+using SDL3;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 
@@ -18,13 +19,19 @@ internal sealed class LevelGameplayState : GameState
     public LevelGameplayState(GameEngine gameEngine) : base(gameEngine)
     {
         _level = new Level();
+
+        _level.SpawnSpecialEntities(GameEngine.AssetStorage);
+        _level.UpdateLantern(GameEngine.Inputs, default);
+
+        for (int i = 0; i < _level.Random.RandomInt(3, 6 + 1); i++)
+        {
+            _level.SpawnEntity(GameEngine.AssetStorage, EntityID.GhostGeneric);
+        }
     }
 
     public override void Enter()
     {
-        _level.SpawnEntity(EntityID.GhostGeneric);
-        _level.SpawnEntity(EntityID.GhostGeneric);
-        _level.SpawnEntity(EntityID.GhostGeneric);
+
     }
 
     public override void Exit()
@@ -35,6 +42,14 @@ internal sealed class LevelGameplayState : GameState
     public override void FixedUpdate(TimeSpan delta)
     {
         _level.FixedUpdateEntities(delta);
+
+        if  (_level.GetAliveEnemyCount() <= 0)
+        {
+            for (int i = 0; i < _level.Random.RandomInt(3, 6 + 1); i++)
+            {
+                _level.SpawnEntity(GameEngine.AssetStorage, EntityID.GhostGeneric);
+            }
+        }
     }
 
     public override void Update(TimeSpan delta)
@@ -46,6 +61,11 @@ internal sealed class LevelGameplayState : GameState
 
     public override void Render(double progress)
     {
+        _level.RenderClear();
+        _level.RenderLevel(GameEngine.AssetStorage, progress);
+        _level.RenderPresent(GameEngine.Bitmap);
+
+
         _level.RenderClear();
         _level.RenderLevel(GameEngine.AssetStorage, progress);
         _level.RenderDarknessLights(progress);

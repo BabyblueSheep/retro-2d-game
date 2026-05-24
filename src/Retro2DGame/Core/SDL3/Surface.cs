@@ -123,6 +123,15 @@ internal sealed class Surface : IDisposable
         return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
     }
 
+    public bool LockSurface()
+    {
+        return SDL.LockSurface(Handle);
+    }
+    public void UnlockSurface()
+    {
+        SDL.UnlockSurface(Handle);
+    }
+
     private void Dispose(bool disposing)
     {
         if (!IsDisposed)

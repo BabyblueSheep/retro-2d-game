@@ -1,5 +1,4 @@
 ﻿using Frent;
-using Frent.Core;
 using Frent.Systems;
 using Retro2DGame.Content.Entities;
 using Retro2DGame.Content.Entities.Components;
@@ -31,49 +30,61 @@ internal sealed class Level
 
     public Level()
     {
-        DefaultUniformProvider uniformProvider = new DefaultUniformProvider();
-
-        World = new World(uniformProvider);
-
-        _playerEntity = PlayerFactory.CreatePlayer(World);
-        _lanternEntity = LanternFactory.CreateLantern(World, Vector2.Zero);
-
-        LightOscillator.UpdateLightOscillators(World, default);
+        World = new World();
 
         _factories = new Dictionary<EntityID, EntityFactory>
         {
+            { EntityID.Lantern, new LanternFactory() },
+            { EntityID.Player, new PlayerFactory() },
             { EntityID.GhostGeneric, new GenericGhostFactory() }
         };
 
         Random = new ConsistentRandom((ulong)DateTime.Now.Ticks);
     }
 
-    public Vector2 GetGenericSpawnPosition()
+    public void SpawnSpecialEntities(AssetStorage assets)
     {
-        const int SPAWN_MARGIN = 32;
-        if (Random.Next() % 2 == 0)
-            return new Vector2(Random.RandomFloat(0, LEVEL_WIDTH + SPAWN_MARGIN), -SPAWN_MARGIN);
-        return new Vector2(LEVEL_WIDTH + SPAWN_MARGIN, Random.RandomFloat(-SPAWN_MARGIN, LEVEL_HEIGHT));
+        _playerEntity = _factories[EntityID.Player].Create(assets, World);
+        _lanternEntity = _factories[EntityID.Lantern].Create(assets, World);
     }
 
-    public void SpawnEntity(EntityID type)
+    public void SpawnEntity(AssetStorage assets, EntityID type)
     {
-        var entity = _factories[type].Create(World);
+        var entity = _factories[type].Create(assets, World);
 
         if (entity.Has<SpawnsAtEdges>())
         {
-            entity.Get<Dimensions>().Position = GetGenericSpawnPosition();
+            entity.Get<Dimensions>().Position = SpawnsAtEdges.GetPosition(Random);
         }
     }
 
     public void FixedUpdateEntities(TimeSpan delta)
     {
-        
+        MovesToTargets.Move(World, delta);
+
+        TakesDamageWhenPunched.Update(World, _lanternEntity);
+        DiesWhenHealthReachesZero.Update(World);
     }
 
     public void UpdateEntities(TimeSpan delta)
     {
         
+    }
+
+    public int GetAliveEnemyCount()
+    {
+        var enemies = World
+            .CreateQuery()
+            .Tagged<EnemyCategory>()
+            .Build();
+
+        var count = 0;
+        foreach (Entity entity in enemies.EnumerateWithEntities())
+        {
+            count++;
+        }
+
+        return count;
     }
 
     public void UpdateLantern(Inputs inputs, TimeSpan delta)
@@ -105,31 +116,11 @@ internal sealed class Level
             0, 0
         );
 
-        PlayerSystems.RenderPlayer(assets, _levelBitmap, _playerEntity);
+        Sprite.RenderSprite(_levelBitmap, _playerEntity, progress);
 
-        LanternSystems.RenderLantern(assets, _levelBitmap, _lanternEntity);
+        Sprite.RenderSprites(_levelBitmap, World, progress);
 
-        /*
-        for (int i = 0; i < _entities.Length; i++)
-        {
-            var entity = _entities[i];
-            if (!entity.IsActive)
-                continue;
-
-            foreach (var system in _entitySystems)
-            {
-                if (!system.AppliesToType(entity.Type))
-                    continue;
-
-                system.Render(this, entity, assets, _levelBitmap, progress);
-            }
-        }
-
-        _levelBitmap.Blit
-        (
-            assets.Player.Lantern,
-            (int)LanternPosition.X + (int)LanternDrawOffset.X, (int)LanternPosition.Y + (int)LanternDrawOffset.Y
-        );*/
+        Sprite.RenderSprite(_levelBitmap, _lanternEntity, progress);
     }
 
     public void RenderDarknessLights(double progress)

@@ -10,31 +10,33 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace Retro2DGame.Content.Entities;
+namespace Retro2DGame.Content.Entities.Factories;
 
-internal struct LanternTag;
-
-internal class LanternFactory
+internal sealed class LanternFactory : EntityFactory
 {
-    public static Entity CreateLantern(World world, Vector2 initialPosition)
+    public override Entity Create(AssetStorage assets, World world)
     {
         var lantern = world.Create();
 
-        lantern.Add(new Dimensions(initialPosition, 8));
+        lantern.Add(new Dimensions(default, 8));
 
+        lantern.Add(new IsPunching(false, false));
         lantern.Add(new IsFocusing(false));
 
-        lantern.Add(new Light(8, 8));
+        lantern.Add(new Light(24, 12));
         lantern.Add(
             new LightOscillator
             (
                 default,
-                24f, 8f, 1f, 0.3f,
-                12f, 4f, 0.5f, 1.6f
+                24f, 4f, 1f, 1.8f,
+                12f, 2f, 0.5f, 1.6f
             )
         );
 
-        lantern.Tag<LanternTag>();
+        lantern.Add(new Sprite(assets.Player.Lantern, new Vector2(-8, -8)));
+        lantern.Tag<DrawnIndividually>();
+
+        lantern.Tag<LanternCategory>();
 
         return lantern;
     }
@@ -73,7 +75,9 @@ internal class LanternSystems
             float.Clamp(entity.Get<Dimensions>().Position.Y, 0, Level.LEVEL_HEIGHT)
         );
 
-        entity.Get<IsFocusing>().Value = inputs.IsMouseLeftClickDown;
+        entity.Get<IsFocusing>().Value = inputs.IsMouseRightClickDown;
+        entity.Get<IsPunching>().HasPunchedThisUpdate = false;
+        entity.Get<IsPunching>().Value = inputs.IsMouseLeftClickDown && !inputs.WasMouseLeftClickDown;
     }
 
     public static void UpdateLanternLight(Entity entity)
@@ -91,24 +95,11 @@ internal class LanternSystems
             entity.Get<LightOscillator>().BaseInner = 24;
             entity.Get<LightOscillator>().BaseOuter = 12;
 
-            entity.Get<LightOscillator>().OffsetInner = 8;
-            entity.Get<LightOscillator>().OffsetOuter = 4;
+            entity.Get<LightOscillator>().OffsetInner = 4;
+            entity.Get<LightOscillator>().OffsetOuter = 2;
         }
-    }
-
-    public const int LANTERN_DRAW_OFFSET_X = -8;
-    public const int LANTERN_DRAW_OFFSET_Y = -8;
-
-    public static void RenderLantern(AssetStorage assets, PaletteIndexBitmap destination, Entity entity)
-    {
-        var position = entity.Get<Dimensions>().Position;
-
-        destination.Blit
-        (
-            assets.Player.Lantern,
-            (int)position.X + LANTERN_DRAW_OFFSET_X, (int)position.Y + LANTERN_DRAW_OFFSET_Y
-        );
     }
 }
 
 internal record struct IsFocusing(bool Value);
+internal record struct IsPunching(bool Value, bool HasPunchedThisUpdate);

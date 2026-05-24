@@ -6,6 +6,8 @@ namespace Retro2DGame.Content.Entities;
 
 internal enum EntityID
 {
+    Lantern,
+    Player,
     GhostGeneric,
     GhostTeleporting,
     GhostSmallNimble,

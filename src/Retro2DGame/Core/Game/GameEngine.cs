@@ -5,6 +5,7 @@ using SDL3;
 using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
+using System.Reflection.Metadata;
 
 namespace Retro2DGame.Core.Game;
 
@@ -26,7 +27,7 @@ internal sealed class GameEngine : IDisposable
     private readonly int _maxUpdateAmountPerTick;
 
     private readonly Surface _presentingSurface;
-    private readonly Renderer _presentingRenderer;
+    //private readonly Renderer _presentingRenderer;
 
     private readonly Renderer _windowRenderer;
     private readonly Texture _windowTexture;
@@ -63,7 +64,7 @@ internal sealed class GameEngine : IDisposable
         _tickDuration = tickDuration;
         _maxUpdateAmountPerTick = maxUpdateAmountPerTick;
         _presentingSurface = Surface.Create(GAME_WIDTH, GAME_HEIGHT, Window.PixelFormat);
-        _presentingRenderer = Renderer.CreateSoftware(_presentingSurface);
+        //_presentingRenderer = Renderer.CreateSoftware(_presentingSurface);
 
         Inputs = new Inputs();
         GameStates = new GameStateStack();
@@ -193,19 +194,25 @@ internal sealed class GameEngine : IDisposable
 
     private void PresentBitmap()
     {
-        _presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
-        _presentingRenderer.Clear();
+        //_presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        //_presentingRenderer.Clear();
 
         SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, Window.Width, Window.Height, SDL.RendererLogicalPresentation.Disabled);
-        _windowRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        _windowRenderer.SetDrawColorFloat(Color.Red.ToFColor());
         _windowRenderer.Clear();
 
         SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
         _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
         _windowRenderer.Clear();
 
-        _presentingRenderer.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette);
-        _presentingRenderer.Present();
+        if (_presentingSurface.LockSurface())
+        {
+            _presentingSurface.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette, Color.Red);
+        }
+        _presentingSurface.UnlockSurface();
+
+        //_presentingRenderer.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette);
+        //_presentingRenderer.Present();
 
         if (Surface.LockTexture(_windowTexture, nint.Zero, out var windowTextureSurface))
         {
@@ -236,7 +243,7 @@ internal sealed class GameEngine : IDisposable
             }
 
             _presentingSurface.Dispose();
-            _presentingRenderer.Dispose();
+            //_presentingRenderer.Dispose();
 
             _windowRenderer.Dispose();
             Window.Dispose();
