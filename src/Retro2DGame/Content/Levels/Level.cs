@@ -24,6 +24,8 @@ internal sealed class Level
     private Entity _playerEntity;
     private Entity _lanternEntity;
 
+    private (Vector2, float, float)[] _cachedLights;
+
     private readonly Dictionary<EntityID, EntityFactory> _factories;
 
     public ConsistentRandom Random { get; }
@@ -31,6 +33,8 @@ internal sealed class Level
     public Level()
     {
         World = new World();
+
+        _cachedLights = new (Vector2, float, float)[2];
 
         _factories = new Dictionary<EntityID, EntityFactory>
         {
@@ -62,7 +66,6 @@ internal sealed class Level
     {
         MovesToTargets.Move(World, delta);
 
-        TakesDamageWhenPunched.Update(World, _lanternEntity);
         DiesWhenHealthReachesZero.Update(World);
     }
 
@@ -91,6 +94,8 @@ internal sealed class Level
     {
         LanternSystems.UpdateLanternPosition(inputs, _lanternEntity, delta);
         LanternSystems.UpdateLanternLight(_lanternEntity);
+
+        TakesDamageWhenPunched.Update(World, _lanternEntity);
     }
 
     public bool IsLanternFocused()
@@ -139,19 +144,37 @@ internal sealed class Level
             .With<Light>()
             .Build();
 
+        var lightCounter = 0;
+        lights.Delegate((ref Dimensions dimensions, ref Light light) =>
+        {
+            lightCounter++;
+        });
+
+        if (lightCounter != _cachedLights.Length)
+        {
+            Array.Resize(ref _cachedLights, lightCounter);
+        }
+
+        lightCounter = 0;
+        lights.Delegate((ref Dimensions dimensions, ref Light light) =>
+        {
+            _cachedLights[lightCounter] = (dimensions.Position, light.InnerRadius, light.OuterRadius);
+            lightCounter++;
+        });
+
         for (int x = 0; x < _levelBitmap.Width; x++)
         {
             for (int y = 0; y < _levelBitmap.Height; y++)
             {
                 var pixelPosition = new Vector2(x, y);
 
-                lights.Delegate((ref Dimensions dimensions, ref Light light) =>
+                foreach (var light in _cachedLights)
                 {
-                    if (Vector2.Distance(pixelPosition, dimensions.Position) < (light.InnerRadius + light.OuterRadius))
+                    if (Vector2.Distance(pixelPosition, light.Item1) < (light.Item2 + light.Item3))
                     {
                         _levelBitmap.WriteContext(1, x, y);
                     }
-                });
+                }
             }
         }
 
@@ -161,13 +184,13 @@ internal sealed class Level
             {
                 var pixelPosition = new Vector2(x, y);
 
-                lights.Delegate((ref Dimensions dimensions, ref Light light) =>
+                foreach (var light in _cachedLights)
                 {
-                    if (Vector2.Distance(pixelPosition, dimensions.Position) < (light.InnerRadius))
+                    if (Vector2.Distance(pixelPosition, light.Item1) < light.Item2)
                     {
                         _levelBitmap.WriteContext(0, x, y);
                     }
-                });
+                }
             }
         }
     }

@@ -2,11 +2,12 @@
 using SDL3;
 using System.Drawing;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Retro2DGame.Core.Game.Rendering;
 
-internal sealed class PaletteIndexBitmap
+internal unsafe sealed class PaletteIndexBitmap : IDisposable
 {
     public const int SHADE_LENGTH_BITS = 5;
     public const int CONTEXT_LENGTH_BITS = 3;
@@ -20,14 +21,19 @@ internal sealed class PaletteIndexBitmap
     public int Width { get; }
     public int Height { get; }
 
-    private readonly byte[] _paletteIndexes;
+    public int Size => Width * Height;
+
+    internal readonly byte* _paletteIndices;
+
+    public bool IsDisposed { get; private set; }
 
     private PaletteIndexBitmap(int width, int height)
     {
         Width = width;
         Height = height;
         
-        _paletteIndexes = new byte[width * height];
+        _paletteIndices = (byte*)Marshal.AllocHGlobal(width * height * sizeof(byte));
+        Clear();
     }
 
     public static PaletteIndexBitmap CreateEmpty(int width, int height)
@@ -60,40 +66,46 @@ internal sealed class PaletteIndexBitmap
         return bitmap;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadIndex(int positionX, int positionY)
     {
-        return _paletteIndexes[positionX + positionY * Width];
+        return _paletteIndices[positionX + positionY * Width];
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteIndex(int index, int positionX, int positionY)
     {
-        _paletteIndexes[positionX + positionY * Width] = (byte)index;
+        _paletteIndices[positionX + positionY * Width] = (byte)index;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadShade(int positionX, int positionY)
     {
-        return _paletteIndexes[positionX + positionY * Width] & SHADE_BITS_MASK;
+        return _paletteIndices[positionX + positionY * Width] & SHADE_BITS_MASK;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteShade(int shade, int positionX, int positionY)
     {
         var shadeConverted = (byte)(shade & SHADE_BITS_MASK);
 
-        _paletteIndexes[positionX + positionY * Width] &= 255 ^ SHADE_BITS_MASK;
-        _paletteIndexes[positionX + positionY * Width] |= shadeConverted;
+        _paletteIndices[positionX + positionY * Width] &= 255 ^ SHADE_BITS_MASK;
+        _paletteIndices[positionX + positionY * Width] |= shadeConverted;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int ReadContext(int positionX, int positionY)
     {
-        return (_paletteIndexes[positionX + positionY * Width] & CONTEXT_BITS_MASK) >> SHADE_LENGTH_BITS;
+        return (_paletteIndices[positionX + positionY * Width] & CONTEXT_BITS_MASK) >> SHADE_LENGTH_BITS;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteContext(int context, int positionX, int positionY)
     {
         var contextConverted = (byte)((context & CONTEXT_BITS_MASK_PRE_SHIFT) << SHADE_LENGTH_BITS);
 
-        _paletteIndexes[positionX + positionY * Width] &= 255 ^ CONTEXT_BITS_MASK;
-        _paletteIndexes[positionX + positionY * Width] |= contextConverted;
+        _paletteIndices[positionX + positionY * Width] &= 255 ^ CONTEXT_BITS_MASK;
+        _paletteIndices[positionX + positionY * Width] |= contextConverted;
     }
 
     public void Blit
@@ -109,28 +121,29 @@ internal sealed class PaletteIndexBitmap
             width = source.Width;
         if (height <= 0)
             height = source.Height;
-        for (int h = 0; h < height; h++)
+
+        var minimumSamplePositionX = int.Max(0, sourcePositionX);
+        var minimumSamplePositionY = int.Max(0, sourcePositionY);
+
+        var maximumSamplePositionX = int.Min(source.Width, sourcePositionX + width);
+        var maximumSamplePositionY = int.Min(source.Height, sourcePositionY + height);
+
+        for (int y = minimumSamplePositionY; y < maximumSamplePositionY; y++)
         {
-            for (int w = 0; w < width; w++)
+            var finalPositionY = destinationPositionY + (y - sourcePositionY);
+
+            if (finalPositionY < 0 || finalPositionY >= Height)
+                continue;
+
+            for (int x = minimumSamplePositionX; x < maximumSamplePositionX; x++)
             {
-                var samplePositionX = sourcePositionX + w;
-                var samplePositionY = sourcePositionY + h;
-
-                if (samplePositionX < 0 || samplePositionX >= source.Width)
-                    continue;
-                if (samplePositionY < 0 || samplePositionY >= source.Height)
-                    continue;
-
-                var indexToCopy = source.ReadIndex(samplePositionX, samplePositionY);
-                if (((indexToCopy & SHADE_BITS_MASK) == TRANSPARENCY_SHADE) && ignoreTransparency)
-                    continue;
-
-                var finalPositionX = destinationPositionX + w;
-                var finalPositionY = destinationPositionY + h;
+                var finalPositionX = destinationPositionX + (x - sourcePositionX);
 
                 if (finalPositionX < 0 || finalPositionX >= Width)
                     continue;
-                if (finalPositionY < 0 || finalPositionY >= Height)
+
+                var indexToCopy = source.ReadIndex(x, y);
+                if (((indexToCopy & SHADE_BITS_MASK) == TRANSPARENCY_SHADE) && ignoreTransparency)
                     continue;
 
                 WriteIndex(indexToCopy, finalPositionX, finalPositionY);
@@ -151,7 +164,39 @@ internal sealed class PaletteIndexBitmap
 
     public void Clear()
     {
-        Array.Clear(_paletteIndexes, 0, _paletteIndexes.Length);
+        for (int y = 0; y < Height; y++)
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                _paletteIndices[x + y * Width] = 0;
+            }    
+        }
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            if (disposing)
+            {
+
+            }
+
+            Marshal.FreeHGlobal((nint)_paletteIndices);
+
+            IsDisposed = true;
+        }
+    }
+
+    ~PaletteIndexBitmap()
+    {
+        Dispose(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -159,59 +204,46 @@ internal static class RendererBitmapExtension
 {
     public static void BlitPaletteIndexBitmap
     (
-        this Renderer renderer, PaletteIndexBitmap bitmap,
-        int destinationX, int destinationY,
-        Palette palette,
-        bool ignoreTransparency = true
+        this Renderer renderer,
+        PaletteIndexBitmap bitmap, Palette palette
     )
     {
         for (var h = 0; h < bitmap.Height; h++)
         {
             for (var w = 0; w < bitmap.Width; w++)
             {
-                var shade = bitmap.ReadShade(w, h);
-                if (shade == PaletteIndexBitmap.TRANSPARENCY_SHADE && ignoreTransparency)
-                    continue;
+                var index = bitmap.ReadIndex(w, h);
 
-                var context = bitmap.ReadContext(w, h);
-
-                renderer.SetDrawColor(palette[shade, context]);
-                renderer.RenderPoint((int)(destinationX + w), (int)(destinationY + h));
+                renderer.SetDrawColor(palette[index]);
+                renderer.RenderPoint(w, h);
             }
         }
     }
 
-    public static void BlitPaletteIndexBitmap
+    public static unsafe void BlitPaletteIndexBitmap
     (
         this Surface surface, 
-        PaletteIndexBitmap bitmap,
-        int destinationX, int destinationY,
-        Palette palette,
-        bool ignoreTransparency = true
+        PaletteIndexBitmap bitmap
     )
     {
         var pitchPixels = surface.Structure.Pitch / sizeof(uint);
 
-        var pixels = SDL.PointerToStructureArray<uint>(surface.Structure.Pixels, pitchPixels * surface.Structure.Height);
-        if (pixels == null)
-            return;
+        //var pixels = SDL.PointerToStructureArray<uint>(surface.Structure.Pixels, pitchPixels * surface.Structure.Height);
+        //if (pixels == null)
+        //    return;
+
+        var pixels = new Span<uint>((uint*)surface.Structure.Pixels, pitchPixels * bitmap.Height);
 
         for (var h = 0; h < bitmap.Height; h++)
         {
             for (var w = 0; w < bitmap.Width; w++)
             {
-                var shade = bitmap.ReadShade(w, h);
-                if (shade == PaletteIndexBitmap.TRANSPARENCY_SHADE && ignoreTransparency)
-                    continue;
-
-                var context = bitmap.ReadContext(w, h);
-                var color = palette[shade, context];
-
-                pixels[(destinationX + w) + (destinationY + h) * pitchPixels] = SDL.MapSurfaceRGBA(surface.Handle, color.R, color.G, color.B, color.A);
+                var index = bitmap.ReadIndex(w, h);
+                pixels[w + h * pitchPixels] = surface.PaletteColors[index];
             }
         }
 
-        Marshal.Copy((int[])(object)pixels, 0, surface.Structure.Pixels, pixels.Length);
+        //Marshal.Copy((int[])(object)pixels, 0, surface.Structure.Pixels, pixels.Length);
 
         //Marshal.StructureToPtr(surface.Structure, surface.Handle, true);
     }

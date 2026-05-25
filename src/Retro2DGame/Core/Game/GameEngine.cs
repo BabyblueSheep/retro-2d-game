@@ -188,13 +188,13 @@ internal sealed class GameEngine : IDisposable
 
         Window.UpdateWindowSurface();
 
-        //SDL.LogInfo(SDL.LogCategory.GPU, $"{deltaTime.Milliseconds}");
+        SDL.LogInfo(SDL.LogCategory.GPU, $"{deltaTime.Milliseconds}");
     }
 
     private void PresentBitmap()
     {
-        _presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
-        _presentingRenderer.Clear();
+        //_presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
+        //_presentingRenderer.Clear();
 
         SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, Window.Width, Window.Height, SDL.RendererLogicalPresentation.Disabled);
         _windowRenderer.SetDrawColorFloat(Color.Red.ToFColor());
@@ -204,13 +204,15 @@ internal sealed class GameEngine : IDisposable
         _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
         _windowRenderer.Clear();
 
+        _presentingSurface.UpdatePalette(Palette);
+
         if (_presentingSurface.LockSurface())
         {
-            _presentingSurface.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette);
+            _presentingSurface.BlitPaletteIndexBitmap(Bitmap);
         }
         _presentingSurface.UnlockSurface();
 
-        //_presentingRenderer.BlitPaletteIndexBitmap(Bitmap, 0, 0, Palette);
+        //_presentingRenderer.BlitPaletteIndexBitmap(Bitmap, Palette);
         //_presentingRenderer.Present();
 
         if (Surface.LockTexture(_windowTexture, nint.Zero, out var windowTextureSurface))
@@ -246,6 +248,8 @@ internal sealed class GameEngine : IDisposable
 
             _windowRenderer.Dispose();
             Window.Dispose();
+
+            AssetStorage.Dispose();
 
             IsDisposed = true;
         }

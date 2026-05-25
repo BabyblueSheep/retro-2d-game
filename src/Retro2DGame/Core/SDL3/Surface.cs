@@ -1,4 +1,6 @@
-﻿using SDL3;
+﻿using Retro2DGame.Core.Game.Rendering;
+using SDL3;
+using System.Drawing;
 
 namespace Retro2DGame.Core.SDL3;
 
@@ -11,6 +13,8 @@ internal sealed class Surface : IDisposable
     public nint Handle { get; }
     public SDL.Surface Structure { get; }
 
+    public uint[] PaletteColors { get; }
+
     public bool IsDisposed { get; private set; }
 
     private Surface(nint handle)
@@ -22,6 +26,8 @@ internal sealed class Surface : IDisposable
             throw new Exception("Surface pointer was invalid");
         }
         Structure = structureNullable.Value;
+
+        PaletteColors = new uint[256];
     }
 
     public static Surface Create(int width, int height, SDL.PixelFormat pixelFormat)

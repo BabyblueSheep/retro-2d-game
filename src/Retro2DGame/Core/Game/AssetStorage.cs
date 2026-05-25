@@ -1,4 +1,5 @@
 ﻿using Retro2DGame.Core.Game.Rendering;
+using Retro2DGame.Core.SDL3;
 using SDL3;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ file class SpriteFrameAttribute : Attribute
 
 file interface IHasAssetsToLoad { }
 
-internal sealed class AssetStorage
+internal sealed class AssetStorage : IDisposable
 {
     public sealed class BackgroundAssetStorage : IHasAssetsToLoad
     {
@@ -247,6 +248,60 @@ internal sealed class AssetStorage
         }
 
         LoadSprites(GetType(), this);
+
+        foreach (var keyValuePair in bitmaps)
+        {
+            keyValuePair.Value.Dispose();
+        }
+    }
+
+    public bool IsDisposed { get; private set; }
+
+    private void Dispose(bool disposing)
+    {
+        if (!IsDisposed)
+        {
+            if (disposing)
+            {
+
+            }
+
+            var frameAttributeType = typeof(SpriteFrameAttribute);
+            var hasAssetsToLoadType = typeof(IHasAssetsToLoad);
+
+            void UnloadSprites(Type assetStorageType, object assetStorageObject)
+            {
+                foreach (var property in assetStorageType.GetProperties())
+                {
+                    if (property.PropertyType.GetInterfaces().Contains(hasAssetsToLoadType))
+                    {
+                        UnloadSprites(property.GetValue(assetStorageObject)!.GetType(), property.GetValue(assetStorageObject)!);
+                        continue;
+                    }
+
+                    var attribute = property.GetCustomAttribute(frameAttributeType);
+                    if (attribute is not SpriteFrameAttribute frameAttribute)
+                        continue;
+
+                    (property.GetValue(assetStorageObject) as PaletteIndexBitmap)!.Dispose();
+                }
+            }
+
+            UnloadSprites(GetType(), this);
+
+            IsDisposed = true;
+        }
+    }
+
+    ~AssetStorage()
+    {
+        Dispose(false);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
     #endregion
 }
