@@ -2,6 +2,7 @@
 using SDL3;
 using System.Drawing;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 
 namespace Retro2DGame.Core.Game.Rendering;
 
@@ -186,18 +187,12 @@ internal static class RendererBitmapExtension
         PaletteIndexBitmap bitmap,
         int destinationX, int destinationY,
         Palette palette,
-        Color? clearColor,
         bool ignoreTransparency = true
     )
     {
+        var pitchPixels = surface.Structure.Pitch / sizeof(uint);
 
-        var surfaceStruct = SDL.PointerToStructure<SDL.Surface>(surface.Handle);
-        if (!surfaceStruct.HasValue)
-            return;
-
-        var pitchPixels = surfaceStruct.Value.Pitch / sizeof(uint);
-
-        var pixels = SDL.PointerToStructureArray<uint>(surfaceStruct.Value.Pixels, pitchPixels * surfaceStruct.Value.Height);
+        var pixels = SDL.PointerToStructureArray<uint>(surface.Structure.Pixels, pitchPixels * surface.Structure.Height);
         if (pixels == null)
             return;
 
@@ -205,11 +200,6 @@ internal static class RendererBitmapExtension
         {
             for (var w = 0; w < bitmap.Width; w++)
             {
-                if (clearColor != null)
-                {
-                    pixels[(destinationX + w) + (destinationY + h) * pitchPixels] = SDL.MapSurfaceRGBA(surface.Handle, clearColor.Value.R, clearColor.Value.G, clearColor.Value.B, clearColor.Value.A);
-                }
-
                 var shade = bitmap.ReadShade(w, h);
                 if (shade == PaletteIndexBitmap.TRANSPARENCY_SHADE && ignoreTransparency)
                     continue;
@@ -220,5 +210,9 @@ internal static class RendererBitmapExtension
                 pixels[(destinationX + w) + (destinationY + h) * pitchPixels] = SDL.MapSurfaceRGBA(surface.Handle, color.R, color.G, color.B, color.A);
             }
         }
+
+        Marshal.Copy((int[])(object)pixels, 0, surface.Structure.Pixels, pixels.Length);
+
+        //Marshal.StructureToPtr(surface.Structure, surface.Handle, true);
     }
 }

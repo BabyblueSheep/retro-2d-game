@@ -1,44 +1,27 @@
 ﻿using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection.Metadata;
-using System.Text;
-using static SDL3.SDL;
 
 namespace Retro2DGame.Core.SDL3;
 
 internal sealed class Surface : IDisposable
 {
-    public int Width
-    {
-        get
-        {
-            var structure = SDL.PointerToStructure<SDL.Surface>(Handle);
-            if (structure == null)
-                return 0;
-            return structure.Value.Width;
-        }
-    }
+    public int Width => Structure.Width;
 
-    public int Height
-    {
-        get
-        {
-            var structure = SDL.PointerToStructure<SDL.Surface>(Handle);
-            if (structure == null)
-                return 0;
-            return structure.Value.Height;
-        }
-    }
+    public int Height => Structure.Height;
 
     public nint Handle { get; }
+    public SDL.Surface Structure { get; }
 
     public bool IsDisposed { get; private set; }
 
     private Surface(nint handle)
     {
         Handle = handle;
+        var structureNullable = SDL.PointerToStructure<SDL.Surface>(Handle);
+        if (!structureNullable.HasValue)
+        {
+            throw new Exception("Surface pointer was invalid");
+        }
+        Structure = structureNullable.Value;
     }
 
     public static Surface Create(int width, int height, SDL.PixelFormat pixelFormat)
