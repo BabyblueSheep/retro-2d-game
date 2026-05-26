@@ -1,5 +1,6 @@
 ﻿using Frent;
 using Frent.Systems;
+using Retro2DGame.Content.Levels;
 
 namespace Retro2DGame.Content.Entities.Components;
 
@@ -7,9 +8,9 @@ internal record struct Light(float InnerRadius, float OuterRadius);
 
 internal record struct LightOscillator(TimeSpan Timer, float BaseInner, float OffsetInner, float SpeedInner, float PhaseInner, float BaseOuter, float OffsetOuter, float SpeedOuter, float PhaseOuter)
 {
-    public static void UpdateLightOscillators(World world, TimeSpan delta)
+    public static void UpdateLightOscillators(Level level, TimeSpan delta)
     {
-        var lightOscillators = world
+        var lightOscillators = level.World
             .CreateQuery()
             .With<Light>()
             .With<LightOscillator>()

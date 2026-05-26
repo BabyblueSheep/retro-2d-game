@@ -1,33 +1,35 @@
 ﻿using Frent;
-using Frent.Systems;
 using Retro2DGame.Content.Entities.Components;
 using Retro2DGame.Content.Levels;
-using Retro2DGame.Core;
 using Retro2DGame.Core.Game;
-using Retro2DGame.Core.Game.Rendering;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 
 namespace Retro2DGame.Content.Entities.Factories;
 
-internal sealed class GhostGenericFactory : EntityFactory
+internal class GhostBruteFactory : EntityFactory
 {
     public override Entity Create(AssetStorage assets, Level level)
     {
         var entity = level.World.Create();
 
-        entity.Add(new Dimensions(default, 8, default));
+        entity.Add(new Dimensions(default, 16, default));
         entity.Add(new RadiusDamageMargin(4));
 
         entity.Add(new SpawnsAtEdges());
 
-        entity.Add(new MovesToTargets(32 + level.Random.RandomFloat(-8f, 8f)));
+        entity.Add(new MovesToTargets(16));
 
-        entity.Add(new Health(1));
+        entity.Add(new Health(6));
+        entity.Add(new ImmunityFrames(default));
         entity.Add(new TakesDamageWhenPunched(1));
         entity.Tag<DiesWhenHealthReachesZero>();
 
-        entity.Add(new Sprite(assets.Sprites.Enemies.GhostGeneric, new Vector2(-8, -8)));
+        entity.Add(new Sprite(assets.Sprites.Enemies.GhostBrute, new Vector2(-16, -16)));
         entity.Add(new IndependentSpriteOffset(default));
+        entity.Add(new ShakeWhenTakingDamage(default, TimeSpan.FromSeconds(1)));
 
         entity.Tag<EnemyCategory>();
         entity.Tag<CanKillPlayer>();

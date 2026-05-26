@@ -187,8 +187,6 @@ internal sealed class GameEngine : IDisposable
         PresentBitmap();
 
         Window.UpdateWindowSurface();
-
-        SDL.LogInfo(SDL.LogCategory.GPU, $"{deltaTime.Milliseconds}");
     }
 
     private void PresentBitmap()
@@ -249,7 +247,7 @@ internal sealed class GameEngine : IDisposable
             _windowRenderer.Dispose();
             Window.Dispose();
 
-            AssetStorage.Dispose();
+            AssetStorage.Sprites.Dispose();
 
             IsDisposed = true;
         }

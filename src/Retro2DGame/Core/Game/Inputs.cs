@@ -26,6 +26,7 @@ internal struct InputButtonState
 internal enum InputButtonType
 {
     Up, Down, Left, Right,
+    Pause,
 
     MenuUp, MenuDown, MenuLeft, MenuRight,
     MenuConfirm
@@ -57,6 +58,7 @@ internal sealed class Inputs
         _buttonStates.Add(InputButtonType.Left,         ([SDL.Scancode.A],      new InputButtonState()));
         _buttonStates.Add(InputButtonType.Right,        ([SDL.Scancode.D],      new InputButtonState()));
         _buttonStates.Add(InputButtonType.Down,         ([SDL.Scancode.S],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Pause,        ([SDL.Scancode.Escape], new InputButtonState()));
 
         _buttonStates.Add(InputButtonType.MenuUp,       ([SDL.Scancode.W],      new InputButtonState()));
         _buttonStates.Add(InputButtonType.MenuLeft,     ([SDL.Scancode.A],      new InputButtonState()));

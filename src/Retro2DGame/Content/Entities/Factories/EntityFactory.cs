@@ -1,4 +1,5 @@
 ﻿using Frent;
+using Retro2DGame.Content.Levels;
 using Retro2DGame.Core.Game;
 using System;
 using System.Collections.Generic;
@@ -8,5 +9,5 @@ namespace Retro2DGame.Content.Entities.Factories;
 
 internal abstract class EntityFactory
 {
-    public abstract Entity Create(AssetStorage assets, World world);
+    public abstract Entity Create(AssetStorage assets, Level level);
 }

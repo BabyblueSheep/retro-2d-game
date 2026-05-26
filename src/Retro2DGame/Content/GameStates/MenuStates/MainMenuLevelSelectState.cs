@@ -25,7 +25,7 @@ internal sealed class MainMenuLevelSelectState : GameState
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
                         _levelToGoTo = 1;
-                        GameEngine.GameStates.Pop();
+                        //GameEngine.GameStates.Pop();
                     }
                 }
             )
@@ -42,7 +42,7 @@ internal sealed class MainMenuLevelSelectState : GameState
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
                         _levelToGoTo = 2;
-                        GameEngine.GameStates.Pop();
+                        //GameEngine.GameStates.Pop();
                     }
                 }
             )
@@ -59,7 +59,7 @@ internal sealed class MainMenuLevelSelectState : GameState
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
                         _levelToGoTo = 3;
-                        GameEngine.GameStates.Pop();
+                        //GameEngine.GameStates.Pop();
                     }
                 }
             )
@@ -75,6 +75,24 @@ internal sealed class MainMenuLevelSelectState : GameState
                 {
                     if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
                     {
+                        _levelToGoTo = 4;
+                        GameEngine.GameStates.Pop();
+                    }
+                }
+            )
+            {
+                Text = "Endless",
+                Dimensions = new RectangleF(128 - TextRenderer.GetTextWidth("Endless") / 2, 160, TextRenderer.GetTextWidth("Endless"), TextRenderer.GetTextHeight()),
+                Margin = new Vector2(4, 4),
+                TextAlignment = TextRenderer.TextAlignment.Center,
+            },
+
+            new UITextButton(
+                (UIButton button) =>
+                {
+                    if (button.State == UIButton.ButtonState.Held && button.PreviousState != UIButton.ButtonState.Held)
+                    {
+                        _levelToGoTo = -1;
                         GameEngine.GameStates.Pop();
                         GameEngine.GameStates.Push(new MainMenuMainState(GameEngine));
                     }
@@ -100,7 +118,15 @@ internal sealed class MainMenuLevelSelectState : GameState
             return;
 
         GameEngine.GameStates.Pop();
-        GameEngine.GameStates.Push(new LevelGameplayState(GameEngine));
+
+        if (_levelToGoTo == 4)
+        {
+            GameEngine.GameStates.Push(new EndlessGameplayState(GameEngine));
+        }
+        else
+        {
+            GameEngine.GameStates.Push(new LevelGameplayState(GameEngine));
+        }
     }
 
     public override void Update(TimeSpan delta)
@@ -116,19 +142,35 @@ internal sealed class MainMenuLevelSelectState : GameState
             _buttonGroup.SelectedIndex = int.Wrap(_buttonGroup.SelectedIndex, 3);
         }
 
-        if
-        (
-            (GameEngine.Inputs.IsDown(InputButtonType.MenuDown) && !GameEngine.Inputs.WasDown(InputButtonType.MenuDown)) ||
-            (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
-        )
+        if (GameEngine.Inputs.IsDown(InputButtonType.MenuDown) && !GameEngine.Inputs.WasDown(InputButtonType.MenuDown))
         {
-            if (_buttonGroup.SelectedIndex != 3)
+            if (_buttonGroup.SelectedIndex == 3)
+            {
+                _buttonGroup.SelectedIndex = 4;
+            }
+            else if (_buttonGroup.SelectedIndex == 4)
+            {
+                _buttonGroup.SelectedIndex = 0;
+            }
+            else
+            {
+                _buttonGroup.SelectedIndex = 3;
+            }
+        }
+
+        if (GameEngine.Inputs.IsDown(InputButtonType.MenuUp) && !GameEngine.Inputs.WasDown(InputButtonType.MenuUp))
+        {
+            if (_buttonGroup.SelectedIndex == 3)
+            {
+                _buttonGroup.SelectedIndex = 0;
+            }
+            else if (_buttonGroup.SelectedIndex == 4)
             {
                 _buttonGroup.SelectedIndex = 3;
             }
             else
             {
-                _buttonGroup.SelectedIndex = 0;
+                _buttonGroup.SelectedIndex = 4;
             }
         }
 

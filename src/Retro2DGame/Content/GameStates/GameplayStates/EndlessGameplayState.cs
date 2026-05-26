@@ -13,7 +13,7 @@ using System.Text;
 
 namespace Retro2DGame.Content.GameStates.GameplayStates;
 
-internal sealed class LevelGameplayState : GameState
+internal class EndlessGameplayState : GameState
 {
     private readonly Level _level;
 
@@ -23,7 +23,7 @@ internal sealed class LevelGameplayState : GameState
 
     private bool _isGameOver;
 
-    public LevelGameplayState(GameEngine gameEngine) : base(gameEngine)
+    public EndlessGameplayState(GameEngine gameEngine) : base(gameEngine)
     {
         _level = new Level();
 
@@ -32,7 +32,9 @@ internal sealed class LevelGameplayState : GameState
 
         _enemyTypes =
         [
-            EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric,
+            EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric,
+            EntityID.GhostDrunk, EntityID.GhostDrunk, EntityID.GhostDrunk, EntityID.GhostDrunk,
+            EntityID.GhostBrute,
             EntityID.GhostTeleporting
         ];
 
@@ -75,7 +77,7 @@ internal sealed class LevelGameplayState : GameState
         {
             _cooldownUntilNewEnemies += delta;
 
-            if (_cooldownUntilNewEnemies >= TimeSpan.FromSeconds(0.5))
+            if (_cooldownUntilNewEnemies >= TimeSpan.FromSeconds(1))
             {
                 _cooldownUntilNewEnemies = TimeSpan.Zero;
 

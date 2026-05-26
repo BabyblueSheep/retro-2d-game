@@ -37,7 +37,7 @@ internal sealed class MainMenuBackgroundState : GameState
     {
         GameEngine.Bitmap.Blit
         (
-            GameEngine.AssetStorage.Background.Generic,
+            GameEngine.AssetStorage.Sprites.Background.Generic,
             0, 0
         );
     }

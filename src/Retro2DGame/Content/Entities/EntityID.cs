@@ -10,5 +10,6 @@ internal enum EntityID
     Player,
     GhostGeneric,
     GhostTeleporting,
-    GhostSmallNimble,
+    GhostBrute,
+    GhostDrunk,
 }
