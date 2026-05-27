@@ -42,6 +42,11 @@ internal class AudioStream : IDisposable
         return stream;
     }
 
+    public bool Clear()
+    {
+        return SDL.ClearAudioStream(Handle);
+    }
+
     public int GetQueuedBytes()
     {
         return SDL.GetAudioStreamQueued(Handle);
@@ -81,7 +86,7 @@ internal class AudioStream : IDisposable
 
             }
 
-            SDL.Free(Handle);
+            SDL.DestroyAudioStream(Handle);
 
             IsDisposed = true;
         }

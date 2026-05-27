@@ -6,6 +6,7 @@ using Retro2DGame.Content.Entities.Components;
 using Retro2DGame.Content.Entities.Factories;
 using Retro2DGame.Core;
 using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Audio;
 using Retro2DGame.Core.Game.Rendering;
 using SDL3;
 using System.Numerics;
@@ -73,13 +74,13 @@ internal sealed class Level
         entity.Get<Dimensions>().PreviousPosition = entity.Get<Dimensions>().Position;
     }
 
-    public void FixedUpdateEntities(TimeSpan delta)
+    public void FixedUpdateEntities(SoundPlayer soundPlayer, TimeSpan delta)
     {
         Dimensions.UpdatePreviousDimensions(this);
 
         ImmunityFrames.Update(this, delta);
 
-        TakesDamageWhenInShine.Update(this, _lanternEntity, delta);
+        TakesDamageWhenInShine.Update(this, soundPlayer, _lanternEntity, delta);
 
         MovesToTargets.Move(this, delta);
         MovesRandomly.Move(this, delta);
@@ -141,11 +142,11 @@ internal sealed class Level
         _lanternEntity.Get<IsPunching>().HasPunchedThisUpdate = false;
     }
 
-    public void UpdateLantern(Inputs inputs, TimeSpan delta)
+    public void UpdateLantern(Inputs inputs, SoundPlayer soundPlayer, TimeSpan delta)
     {
         LanternSystems.UpdateLanternPosition(inputs, _lanternEntity, delta);
 
-        TakesDamageWhenPunched.Update(this, _lanternEntity);
+        TakesDamageWhenPunched.Update(this, soundPlayer,  _lanternEntity);
     }
 
     public bool IsLanternFocused()

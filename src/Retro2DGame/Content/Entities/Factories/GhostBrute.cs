@@ -31,6 +31,9 @@ internal class GhostBruteFactory : EntityFactory
         entity.Add(new IndependentSpriteOffset(default));
         entity.Add(new ShakeWhenTakingDamage(default, TimeSpan.FromSeconds(1)));
 
+        entity.Add(new PlaySoundWhenPunched(assets.Audio.Hurt1));
+        entity.Add(new PlaySoundWhenDying(assets.Audio.Hurt3));
+
         entity.Tag<EnemyCategory>();
         entity.Tag<CanKillPlayer>();
 

@@ -29,6 +29,8 @@ internal sealed class GhostGenericFactory : EntityFactory
         entity.Add(new Sprite(assets.Sprites.Enemies.GhostGeneric, new Vector2(-8, -8)));
         entity.Add(new IndependentSpriteOffset(default));
 
+        entity.Add(new PlaySoundWhenDying(assets.Audio.Hurt3));
+
         entity.Tag<EnemyCategory>();
         entity.Tag<CanKillPlayer>();
 

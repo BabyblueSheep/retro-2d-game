@@ -16,7 +16,7 @@ internal sealed class Program
 
         SDL.SetLogPriorities(SDL.LogPriority.Trace);
 
-        var initFlags = SDL.InitFlags.Video;
+        var initFlags = SDL.InitFlags.Video | SDL.InitFlags.Audio;
         if (!SDL.Init(initFlags))
 		{
 			SDL.LogError(SDL.LogCategory.Application, $"Couldn't initialize SDL: {SDL.GetError()}");

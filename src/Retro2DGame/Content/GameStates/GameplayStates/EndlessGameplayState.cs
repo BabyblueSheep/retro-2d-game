@@ -28,7 +28,7 @@ internal class EndlessGameplayState : GameState
         _level = new Level();
 
         _level.SpawnSpecialEntities(GameEngine.AssetStorage);
-        _level.UpdateLantern(GameEngine.Inputs, default);
+        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, default);
 
         _enemyTypes =
         [
@@ -61,7 +61,7 @@ internal class EndlessGameplayState : GameState
             return;
         }
 
-        _level.FixedUpdateEntities(delta);
+        _level.FixedUpdateEntities(GameEngine.SoundPlayer, delta);
 
         _level.UpdateFixedLantern(GameEngine.Inputs, delta);
 
@@ -107,7 +107,7 @@ internal class EndlessGameplayState : GameState
 
         _level.UpdateEntities(delta);
 
-        _level.UpdateLantern(GameEngine.Inputs, delta);
+        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, delta);
 
         _level.UpdateLights(delta);
 

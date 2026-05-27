@@ -19,16 +19,21 @@ internal sealed class SoundPlayer : IDisposable
         _stream.Resume();
     }
 
+    public void PlaySound(SoundEffect soundEffect)
+    {
+        _stream.Clear();
+        _stream.SetFormat(soundEffect.Spec, soundEffect.Spec);
+        _stream.PutData(soundEffect.Handle, (int)soundEffect.Length);
+    }
+
     private void Dispose(bool disposing)
     {
         if (!IsDisposed)
         {
             if (disposing)
             {
-
+                _stream.Dispose();
             }
-
-            _stream.Dispose();
 
             IsDisposed = true;
         }

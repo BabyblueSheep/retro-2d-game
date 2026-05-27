@@ -31,6 +31,8 @@ internal sealed class GhostDrunkFactory : EntityFactory
         entity.Add(new IndependentSpriteOffset(default));
         entity.Tag<ShakeWhenInLight>();
 
+        entity.Add(new PlaySoundWhenDying(assets.Audio.Hurt3));
+
         entity.Tag<EnemyCategory>();
         entity.Tag<CanKillPlayer>();
 

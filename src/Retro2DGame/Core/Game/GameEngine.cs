@@ -1,4 +1,5 @@
-﻿using Retro2DGame.Core.Game.Rendering;
+﻿using Retro2DGame.Core.Game.Audio;
+using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.SDL3;
 using Retro2DGame.Core.SDL3.Extensions;
 using SDL3;
@@ -40,6 +41,8 @@ internal sealed class GameEngine : IDisposable
     public Palette Palette { get; }
     public PaletteIndexBitmap Bitmap { get; }
 
+    public SoundPlayer SoundPlayer { get; }
+
     public Window Window { get; }
 
     public bool HasRequestedToDie { get; private set; }
@@ -72,6 +75,8 @@ internal sealed class GameEngine : IDisposable
 
         Palette = new Palette(); 
         Bitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
+
+        SoundPlayer = new SoundPlayer();
 
 
         Palette[0, 0] = Color.Transparent;
@@ -238,16 +243,14 @@ internal sealed class GameEngine : IDisposable
         {
             if (disposing)
             {
-                
+                _presentingSurface.Dispose();
+                _presentingRenderer.Dispose();
+
+                _windowRenderer.Dispose();
+                Window.Dispose();
+
+                AssetStorage.Sprites.Dispose();
             }
-
-            _presentingSurface.Dispose();
-            _presentingRenderer.Dispose();
-
-            _windowRenderer.Dispose();
-            Window.Dispose();
-
-            AssetStorage.Sprites.Dispose();
 
             IsDisposed = true;
         }

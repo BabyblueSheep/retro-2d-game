@@ -28,11 +28,13 @@ internal sealed class LevelGameplayState : GameState
         _level = new Level();
 
         _level.SpawnSpecialEntities(GameEngine.AssetStorage);
-        _level.UpdateLantern(GameEngine.Inputs, default);
+        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, default);
 
         _enemyTypes =
         [
-            EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric,
+            EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric, EntityID.GhostGeneric,
+            EntityID.GhostDrunk, EntityID.GhostDrunk, EntityID.GhostDrunk, EntityID.GhostDrunk,
+            EntityID.GhostBrute,
             EntityID.GhostTeleporting
         ];
 
@@ -59,7 +61,7 @@ internal sealed class LevelGameplayState : GameState
             return;
         }
 
-        _level.FixedUpdateEntities(delta);
+        _level.FixedUpdateEntities(GameEngine.SoundPlayer, delta);
 
         _level.UpdateFixedLantern(GameEngine.Inputs, delta);
 
@@ -75,7 +77,7 @@ internal sealed class LevelGameplayState : GameState
         {
             _cooldownUntilNewEnemies += delta;
 
-            if (_cooldownUntilNewEnemies >= TimeSpan.FromSeconds(0.5))
+            if (_cooldownUntilNewEnemies >= TimeSpan.FromSeconds(1))
             {
                 _cooldownUntilNewEnemies = TimeSpan.Zero;
 
@@ -105,7 +107,7 @@ internal sealed class LevelGameplayState : GameState
 
         _level.UpdateEntities(delta);
 
-        _level.UpdateLantern(GameEngine.Inputs, delta);
+        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, delta);
 
         _level.UpdateLights(delta);
 
