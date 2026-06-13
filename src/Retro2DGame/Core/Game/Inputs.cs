@@ -1,5 +1,4 @@
 ﻿using Retro2DGame.Core.NetExtensions;
-using SDL3;
 using System.Numerics;
 
 namespace Retro2DGame.Core.Game;
@@ -48,23 +47,23 @@ internal sealed class Inputs
     public bool WasMouseRightClickDown { get; private set; }
 
 
-    private readonly Dictionary<InputButtonType, (HashSet<SDL.Scancode>, InputButtonState)> _buttonStates;
+    private readonly Dictionary<InputButtonType, (HashSet<SDL3.SDL.Scancode>, InputButtonState)> _buttonStates;
 
     public Inputs()
     {
         _buttonStates = [];
 
-        _buttonStates.Add(InputButtonType.Up,           ([SDL.Scancode.W],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Left,         ([SDL.Scancode.A],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Right,        ([SDL.Scancode.D],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Down,         ([SDL.Scancode.S],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.Pause,        ([SDL.Scancode.Escape], new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Up,           ([SDL3.SDL.Scancode.W],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Left,         ([SDL3.SDL.Scancode.A],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Right,        ([SDL3.SDL.Scancode.D],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Down,         ([SDL3.SDL.Scancode.S],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.Pause,        ([SDL3.SDL.Scancode.Escape], new InputButtonState()));
 
-        _buttonStates.Add(InputButtonType.MenuUp,       ([SDL.Scancode.W],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuLeft,     ([SDL.Scancode.A],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuRight,    ([SDL.Scancode.D],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuDown,     ([SDL.Scancode.S],      new InputButtonState()));
-        _buttonStates.Add(InputButtonType.MenuConfirm,  ([SDL.Scancode.Return], new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuUp,       ([SDL3.SDL.Scancode.W],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuLeft,     ([SDL3.SDL.Scancode.A],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuRight,    ([SDL3.SDL.Scancode.D],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuDown,     ([SDL3.SDL.Scancode.S],      new InputButtonState()));
+        _buttonStates.Add(InputButtonType.MenuConfirm,  ([SDL3.SDL.Scancode.Return], new InputButtonState()));
     }
 
     public void Reset()
@@ -96,13 +95,13 @@ internal sealed class Inputs
         }
     }
 
-    public void UpdateEvent(SDL.Event @event, Vector2 windowSize, Vector2 gameSize)
+    public void UpdateEvent(SDL3.SDL.Event @event, Vector2 windowSize, Vector2 gameSize)
     {
         switch (@event.Key.Type)
         {
-            case SDL.EventType.KeyDown:
-            case SDL.EventType.KeyUp:
-                var isDown = (SDL.EventType)@event.Type == SDL.EventType.KeyDown;
+            case SDL3.SDL.EventType.KeyDown:
+            case SDL3.SDL.EventType.KeyUp:
+                var isDown = (SDL3.SDL.EventType)@event.Type == SDL3.SDL.EventType.KeyDown;
                 foreach (var inputButtonType in _buttonStates.Keys)
                 {
                     var buttonState = _buttonStates[inputButtonType];
@@ -116,7 +115,7 @@ internal sealed class Inputs
                 }
                 break;
 
-            case SDL.EventType.MouseMotion:
+            case SDL3.SDL.EventType.MouseMotion:
                 _mousePosition.X = @event.Motion.X;
                 _mousePosition.Y = @event.Motion.Y;
 
@@ -125,16 +124,16 @@ internal sealed class Inputs
 
                 break;
 
-            case SDL.EventType.MouseButtonDown:
-                if (@event.Button.Button == SDL.ButtonLeft)
+            case SDL3.SDL.EventType.MouseButtonDown:
+                if (@event.Button.Button == SDL3.SDL.ButtonLeft)
                     IsMouseLeftClickDown = true;
-                if (@event.Button.Button == SDL.ButtonRight)
+                if (@event.Button.Button == SDL3.SDL.ButtonRight)
                     IsMouseRightClickDown = true;
                 break;
-            case SDL.EventType.MouseButtonUp:
-                if (@event.Button.Button == SDL.ButtonLeft)
+            case SDL3.SDL.EventType.MouseButtonUp:
+                if (@event.Button.Button == SDL3.SDL.ButtonLeft)
                     IsMouseLeftClickDown = false;
-                if (@event.Button.Button == SDL.ButtonRight)
+                if (@event.Button.Button == SDL3.SDL.ButtonRight)
                     IsMouseRightClickDown = false;
                 break;
 

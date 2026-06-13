@@ -1,6 +1,7 @@
 ﻿using Retro2DGame.Core.Game.Audio;
 using Retro2DGame.Core.Game.Rendering;
-using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.MixerWrappers;
+using Retro2DGame.Core.SDLWrappers;
 using SDL3;
 using System;
 using System.Collections.Generic;
@@ -318,8 +319,8 @@ internal sealed class AssetStorage
 
     public sealed class AudioStorage : IDisposable
     {
-        public SoundEffect Hurt1 { get; } = SoundEffect.LoadWAV($"resources\\sounds\\hurt1.wav");
-        public SoundEffect Hurt3 { get; } = SoundEffect.LoadWAV($"resources\\sounds\\hurt3.wav");
+        public AudioEffect Hurt1 = AudioEffect.Load($"resources\\sounds\\hurt1.wav");
+        public AudioEffect Hurt3 = AudioEffect.Load($"resources\\sounds\\hurt3.wav");
 
         public bool IsDisposed { get; private set; }
 
@@ -329,7 +330,7 @@ internal sealed class AssetStorage
             {
                 if (disposing)
                 {
-                    Hurt1.Dispose();
+                    //Hurt1.Dispose();
                 }
 
                 IsDisposed = true;

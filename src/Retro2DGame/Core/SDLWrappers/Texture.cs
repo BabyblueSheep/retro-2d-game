@@ -1,14 +1,13 @@
-﻿using SDL3;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace Retro2DGame.Core.SDL3;
+namespace Retro2DGame.Core.SDLWrappers;
 
 internal sealed class Texture : IDisposable
 {
     [StructLayout(LayoutKind.Sequential)]
     private struct SDLTexture
     {
-        public SDL.PixelFormat Format;
+        public SDL3.SDL.PixelFormat Format;
 
         public int Width;
         public int Height;
@@ -20,7 +19,7 @@ internal sealed class Texture : IDisposable
     {
         get
         {
-            var structure = SDL.PointerToStructure<SDLTexture>(Handle);
+            var structure = SDL3.SDL.PointerToStructure<SDLTexture>(Handle);
             if (structure == null)
                 return 0;
             return structure.Value.Width;
@@ -31,24 +30,24 @@ internal sealed class Texture : IDisposable
     {
         get
         {
-            var structure = SDL.PointerToStructure<SDLTexture>(Handle);
+            var structure = SDL3.SDL.PointerToStructure<SDLTexture>(Handle);
             if (structure == null)
                 return 0;
             return structure.Value.Height;
         }
     }
 
-    public SDL.ScaleMode ScaleMode
+    public SDL3.SDL.ScaleMode ScaleMode
     {
         get
         {
-            SDL.GetTextureScaleMode(Handle, out var scaleMode);
+            SDL3.SDL.GetTextureScaleMode(Handle, out var scaleMode);
             return scaleMode;
         }
 
         set
         {
-            SDL.SetTextureScaleMode(Handle, value);
+            SDL3.SDL.SetTextureScaleMode(Handle, value);
         }
     }
 
@@ -61,12 +60,12 @@ internal sealed class Texture : IDisposable
         Handle = handle; 
     }
 
-    public static Texture Create(Renderer renderer, SDL.PixelFormat format, SDL.TextureAccess access, int width, int height)
+    public static Texture Create(Renderer renderer, SDL3.SDL.PixelFormat format, SDL3.SDL.TextureAccess access, int width, int height)
     {
-        var handle = SDL.CreateTexture(renderer.Handle, format, access, width, height);
+        var handle = SDL3.SDL.CreateTexture(renderer.Handle, format, access, width, height);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create texture: {SDL.GetError()}");
+            throw new Exception($"Couldn't create texture: {SDL3.SDL.GetError()}");
         }
         var texture = new Texture(handle);
         return texture;
@@ -74,10 +73,10 @@ internal sealed class Texture : IDisposable
 
     public static Texture CreateFromSurface(Renderer renderer, Surface surface)
     {
-        var handle = SDL.CreateTextureFromSurface(renderer.Handle, surface.Handle);
+        var handle = SDL3.SDL.CreateTextureFromSurface(renderer.Handle, surface.Handle);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create texture: {SDL.GetError()}");
+            throw new Exception($"Couldn't create texture: {SDL3.SDL.GetError()}");
         }
         var texture = new Texture(handle);
         return texture;
@@ -85,15 +84,15 @@ internal sealed class Texture : IDisposable
 
     public bool Lock(nint rectangle, out nint pixels, out int pitch)
     {
-        var result = SDL.LockTexture(Handle, rectangle, out var _pixels, out var _pitch);
+        var result = SDL3.SDL.LockTexture(Handle, rectangle, out var _pixels, out var _pitch);
         pixels = _pixels;
         pitch = _pitch;
         return result;
     }
 
-    public bool Lock(SDL.Rect rectangle, out nint pixels, out int pitch)
+    public bool Lock(SDL3.SDL.Rect rectangle, out nint pixels, out int pitch)
     {
-        var result = SDL.LockTexture(Handle, rectangle, out var _pixels, out var _pitch);
+        var result = SDL3.SDL.LockTexture(Handle, rectangle, out var _pixels, out var _pitch);
         pixels = _pixels;
         pitch = _pitch;
         return result;
@@ -101,7 +100,7 @@ internal sealed class Texture : IDisposable
 
     public void Unlock()
     {
-        SDL.UnlockTexture(Handle);
+        SDL3.SDL.UnlockTexture(Handle);
     }
 
     private void Dispose(bool disposing)
@@ -113,7 +112,7 @@ internal sealed class Texture : IDisposable
 
             }
 
-            SDL.DestroyTexture(Handle);
+            SDL3.SDL.DestroyTexture(Handle);
 
             IsDisposed = true;
         }

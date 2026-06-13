@@ -3,7 +3,7 @@ using Retro2DGame.Content.GameStates.MenuStates;
 using Retro2DGame.Content.Levels;
 using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
-using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.SDLWrappers;
 using SDL3;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ internal class EndlessGameplayState : GameState
         _level = new Level();
 
         _level.SpawnSpecialEntities(GameEngine.AssetStorage);
-        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, default);
+        _level.UpdateLantern(GameEngine.Inputs, default);
 
         _enemyTypes =
         [
@@ -46,12 +46,12 @@ internal class EndlessGameplayState : GameState
 
     public override void Enter()
     {
-
+        GameEngine.Logger.LogDebug($"Entering game state {nameof(EndlessGameplayState)}");
     }
 
     public override void Exit()
     {
-
+        GameEngine.Logger.LogDebug($"Exiting game state {nameof(EndlessGameplayState)}");
     }
 
     public override void FixedUpdate(TimeSpan delta)
@@ -61,7 +61,7 @@ internal class EndlessGameplayState : GameState
             return;
         }
 
-        _level.FixedUpdateEntities(GameEngine.SoundPlayer, delta);
+        _level.FixedUpdateEntities(delta);
 
         _level.UpdateFixedLantern(GameEngine.Inputs, delta);
 
@@ -107,7 +107,7 @@ internal class EndlessGameplayState : GameState
 
         _level.UpdateEntities(delta);
 
-        _level.UpdateLantern(GameEngine.Inputs, GameEngine.SoundPlayer, delta);
+        _level.UpdateLantern(GameEngine.Inputs, delta);
 
         _level.UpdateLights(delta);
 

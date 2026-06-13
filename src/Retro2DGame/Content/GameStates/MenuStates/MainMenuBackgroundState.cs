@@ -15,12 +15,12 @@ internal sealed class MainMenuBackgroundState : GameState
 
     public override void Enter()
     {
-        
+        GameEngine.Logger.LogDebug($"Entering game state {nameof(MainMenuBackgroundState)}");
     }
 
     public override void Exit()
     {
-        
+        GameEngine.Logger.LogDebug($"Entering game state {nameof(MainMenuBackgroundState)}");
     }
 
     public override void Update(TimeSpan delta)

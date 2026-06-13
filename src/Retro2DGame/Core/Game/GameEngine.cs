@@ -1,12 +1,10 @@
 ﻿using Retro2DGame.Core.Game.Audio;
 using Retro2DGame.Core.Game.Rendering;
-using Retro2DGame.Core.SDL3;
-using Retro2DGame.Core.SDL3.Extensions;
-using SDL3;
+using Retro2DGame.Core.SDLWrappers;
+using Retro2DGame.Core.SDLWrappers.Extensions;
 using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
-using System.Reflection.Metadata;
 
 namespace Retro2DGame.Core.Game;
 
@@ -33,6 +31,8 @@ internal sealed class GameEngine : IDisposable
     private readonly Renderer _windowRenderer;
     private readonly Texture _windowTexture;
 
+    private readonly ConsistentRandom _random;
+
 
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
@@ -41,9 +41,12 @@ internal sealed class GameEngine : IDisposable
     public Palette Palette { get; }
     public PaletteIndexBitmap Bitmap { get; }
 
-    public SoundPlayer SoundPlayer { get; }
+    public IndependentAudioPlayer MusicPlayer { get; }
+    public IndependentAudioPlayer SoundPlayer { get; }
 
     public Window Window { get; }
+
+    public Logger Logger { get; }
 
     public bool HasRequestedToDie { get; private set; }
 
@@ -51,14 +54,20 @@ internal sealed class GameEngine : IDisposable
 
     public GameEngine
     (
-        TimeSpan tickDuration, int maxUpdateAmountPerTick
+        TimeSpan tickDuration, int maxUpdateAmountPerTick,
+        string logFilePath
     )
     {
-        var windowFlags = SDL.WindowFlags.Resizable;
+        Logger = new Logger();
+        Logger.EnableConsoleLogging();
+        Logger.EnableFileLogging(logFilePath);
+        Logger.LogPriority = Logger.LogPriorityLevel.Debug;
+
+        var windowFlags = SDL3.SDL.WindowFlags.Resizable;
         Window = new Window("Game", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, windowFlags);
         _windowRenderer = Renderer.Create(Window, "software");
-        _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
-        _windowTexture.ScaleMode = SDL.ScaleMode.PixelArt;
+        _windowTexture = Texture.Create(_windowRenderer, Window.PixelFormat, SDL3.SDL.TextureAccess.Streaming, GAME_WIDTH, GAME_HEIGHT);
+        _windowTexture.ScaleMode = SDL3.SDL.ScaleMode.PixelArt;
 
         _timeTracker = new Stopwatch();
         _previousElapsedTime = _timeTracker.Elapsed;
@@ -73,10 +82,13 @@ internal sealed class GameEngine : IDisposable
         GameStates = new GameStateStack();
         AssetStorage = new AssetStorage();
 
-        Palette = new Palette(); 
+        Palette = new Palette();
         Bitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
 
-        SoundPlayer = new SoundPlayer();
+        MusicPlayer = new IndependentAudioPlayer(4);
+        SoundPlayer = new IndependentAudioPlayer(16);
+
+        _random = new ConsistentRandom();
 
 
         Palette[0, 0] = Color.Transparent;
@@ -102,6 +114,8 @@ internal sealed class GameEngine : IDisposable
 
     public void Start()
     {
+        Logger.LogInfo("Starting the game!");
+
         _timeTracker.Start();
 
         Inputs.Reset();
@@ -109,6 +123,8 @@ internal sealed class GameEngine : IDisposable
 
     public void Stop()
     {
+        Logger.LogInfo("Stopping the game!");
+
         while (GameStates.Count > 0)
         {
             var gameState = GameStates.Pop();
@@ -124,13 +140,14 @@ internal sealed class GameEngine : IDisposable
     public void Run()
     {
         Inputs.Propagate();
-        while (SDL.PollEvent(out var @event))
+        while (SDL3.SDL.PollEvent(out var @event))
         {
-            switch ((SDL.EventType)@event.Type)
+            switch ((SDL3.SDL.EventType)@event.Type)
             {
-                case SDL.EventType.WindowResized:
+                case SDL3.SDL.EventType.WindowResized:
                     break;
-                case SDL.EventType.WindowPixelSizeChanged:
+
+                case SDL3.SDL.EventType.WindowPixelSizeChanged:
                     Window.UpdateWindowSize();
 
                     //_windowRenderer = Renderer.Create(Window, "software");
@@ -142,17 +159,18 @@ internal sealed class GameEngine : IDisposable
                     //_windowRenderer.Clear();
                     break;
 
-                case SDL.EventType.KeyDown:
-                case SDL.EventType.KeyUp:
-                case SDL.EventType.MouseMotion:
-                case SDL.EventType.MouseButtonDown:
-                case SDL.EventType.MouseButtonUp:
+                case SDL3.SDL.EventType.KeyDown:
+                case SDL3.SDL.EventType.KeyUp:
+                case SDL3.SDL.EventType.MouseMotion:
+                case SDL3.SDL.EventType.MouseButtonDown:
+                case SDL3.SDL.EventType.MouseButtonUp:
                     Inputs.UpdateEvent(@event, Window.Size, GAME_SIZE);
                     break;
                     
-                case SDL.EventType.Quit:
+                case SDL3.SDL.EventType.Quit:
                     RequestToDie();
                     break;
+
                 default:
                     break;
 
@@ -189,6 +207,11 @@ internal sealed class GameEngine : IDisposable
             state.Render(frameProgress);
         }
 
+        if (Inputs.IsMouseLeftClickDown && !Inputs.WasMouseLeftClickDown)
+        {
+            SoundPlayer.Play(AssetStorage.Audio.Hurt3, AudioPlayParameters.Default with { Pitch = _random.RandomFloat(0.1f, 0.3f) });
+        }
+
         PresentBitmap();
 
         Window.UpdateWindowSurface();
@@ -199,11 +222,11 @@ internal sealed class GameEngine : IDisposable
         //_presentingRenderer.SetDrawColorFloat(Color.Black.ToFColor());
         //_presentingRenderer.Clear();
 
-        SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, Window.Width, Window.Height, SDL.RendererLogicalPresentation.Disabled);
+        SDL3.SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, Window.Width, Window.Height, SDL3.SDL.RendererLogicalPresentation.Disabled);
         _windowRenderer.SetDrawColorFloat(Color.Red.ToFColor());
         _windowRenderer.Clear();
 
-        SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL.RendererLogicalPresentation.Letterbox);
+        SDL3.SDL.SetRenderLogicalPresentation(_windowRenderer.Handle, GAME_WIDTH, GAME_HEIGHT, SDL3.SDL.RendererLogicalPresentation.Letterbox);
         _windowRenderer.SetDrawColorFloat(Color.White.ToFColor());
         _windowRenderer.Clear();
 
@@ -220,12 +243,12 @@ internal sealed class GameEngine : IDisposable
 
         if (Surface.LockTexture(_windowTexture, nint.Zero, out var windowTextureSurface))
         {
-            _presentingSurface.BlitSurface(windowTextureSurface!, new SDL.Rect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
+            _presentingSurface.BlitSurface(windowTextureSurface!, new SDL3.SDL.Rect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
             _windowTexture.Unlock();
         }
 
-        _windowRenderer.RenderTexture(_windowTexture, new SDL.FRect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
+        _windowRenderer.RenderTexture(_windowTexture, new SDL3.SDL.FRect() { X = 0, Y = 0, W = GAME_WIDTH, H = GAME_HEIGHT }, nint.Zero);
 
         _windowRenderer.Present();
     }

@@ -2,8 +2,8 @@ using Retro2DGame.Core.NetExtensions;
 using Retro2DGame.Core.Game;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.Game.UI;
-using Retro2DGame.Core.SDL3;
-using Retro2DGame.Core.SDL3.Extensions;
+using Retro2DGame.Core.SDLWrappers;
+using Retro2DGame.Core.SDLWrappers.Extensions;
 using SDL3;
 using System.Drawing;
 using System.Numerics;
@@ -72,12 +72,12 @@ internal sealed class MainMenuMainState : GameState
 
     public override void Enter()
     {
-
+        GameEngine.Logger.LogDebug($"Entering game state {nameof(MainMenuMainState)}");
     }
 
     public override void Exit()
     {
-
+        GameEngine.Logger.LogDebug($"Exiting game state {nameof(MainMenuMainState)}");
     }
 
     public override void Update(TimeSpan delta)

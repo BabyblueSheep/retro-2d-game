@@ -74,13 +74,13 @@ internal sealed class Level
         entity.Get<Dimensions>().PreviousPosition = entity.Get<Dimensions>().Position;
     }
 
-    public void FixedUpdateEntities(SoundPlayer soundPlayer, TimeSpan delta)
+    public void FixedUpdateEntities(TimeSpan delta)
     {
         Dimensions.UpdatePreviousDimensions(this);
 
         ImmunityFrames.Update(this, delta);
 
-        TakesDamageWhenInShine.Update(this, soundPlayer, _lanternEntity, delta);
+        TakesDamageWhenInShine.Update(this, _lanternEntity, delta);
 
         MovesToTargets.Move(this, delta);
         MovesRandomly.Move(this, delta);
@@ -142,11 +142,11 @@ internal sealed class Level
         _lanternEntity.Get<IsPunching>().HasPunchedThisUpdate = false;
     }
 
-    public void UpdateLantern(Inputs inputs, SoundPlayer soundPlayer, TimeSpan delta)
+    public void UpdateLantern(Inputs inputs, TimeSpan delta)
     {
         LanternSystems.UpdateLanternPosition(inputs, _lanternEntity, delta);
 
-        TakesDamageWhenPunched.Update(this, soundPlayer,  _lanternEntity);
+        TakesDamageWhenPunched.Update(this, _lanternEntity);
     }
 
     public bool IsLanternFocused()

@@ -41,7 +41,7 @@ internal record struct RadiusDamageMargin(float Value);
 
 internal record struct TakesDamageWhenPunched(int AmountReduced)
 {
-    public static void Update(Level level, SoundPlayer soundPlayer, Entity lantern)
+    public static void Update(Level level, Entity lantern)
     {
         var lanternPosition = lantern.Get<Dimensions>().Position;
 
@@ -70,14 +70,14 @@ internal record struct TakesDamageWhenPunched(int AmountReduced)
             if (Vector2.Distance(lanternPosition, dimensions.Value.Position) < radius && lantern.Get<IsPunching>().Value && !lantern.Get<IsPunching>().HasPunchedThisUpdate)
             {
                 health.Value.Value -= takesDamageWhenPunched.Value.AmountReduced;
-                OnDamageEffectsSystem.Update(level, soundPlayer, entity);
+                OnDamageEffectsSystem.Update(level, entity);
                 lantern.Get<IsPunching>().HasPunchedThisUpdate = true;
 
 
-                if (entity.Has<PlaySoundWhenPunched>() && health.Value.Value > 0)
+                /*if (entity.Has<PlaySoundWhenPunched>() && health.Value.Value > 0)
                 {
-                    soundPlayer.PlaySound(entity.Get<PlaySoundWhenPunched>().SoundEffect);
-                }
+                    //soundPlayer.PlaySound(entity.Get<PlaySoundWhenPunched>().SoundEffect);
+                }*/
             }
         }
     }
@@ -85,7 +85,7 @@ internal record struct TakesDamageWhenPunched(int AmountReduced)
 
 internal record struct TakesDamageWhenInShine(TimeSpan Timer, TimeSpan DamageInterval, int AmountReducedWhenReachingInterval)
 {
-    public static void Update(Level level, SoundPlayer soundPlayer, Entity lantern, TimeSpan delta)
+    public static void Update(Level level, Entity lantern, TimeSpan delta)
     {
         var lanternPosition = lantern.Get<Dimensions>().Position;
 
@@ -107,7 +107,7 @@ internal record struct TakesDamageWhenInShine(TimeSpan Timer, TimeSpan DamageInt
                     takesDamageWhenInShine.Value.Timer -= takesDamageWhenInShine.Value.DamageInterval;
 
                     health.Value.Value -= takesDamageWhenInShine.Value.AmountReducedWhenReachingInterval;
-                    OnDamageEffectsSystem.Update(level, soundPlayer, entity);
+                    OnDamageEffectsSystem.Update(level, entity);
                 }
             }
             else
@@ -120,7 +120,7 @@ internal record struct TakesDamageWhenInShine(TimeSpan Timer, TimeSpan DamageInt
 
 internal class OnDamageEffectsSystem
 {
-    public static void Update(Level level, SoundPlayer soundPlayer, Entity entityThatTookDamage)
+    public static void Update(Level level, Entity entityThatTookDamage)
     {
         var health = entityThatTookDamage.Get<Health>();
 
@@ -128,10 +128,10 @@ internal class OnDamageEffectsSystem
         {
             level.WorldCommandBuffer.DeleteEntity(entityThatTookDamage);
 
-            if (entityThatTookDamage.Has<PlaySoundWhenDying>())
+            /*if (entityThatTookDamage.Has<PlaySoundWhenDying>())
             {
-                soundPlayer.PlaySound(entityThatTookDamage.Get<PlaySoundWhenDying>().SoundEffect);
-            }
+                //soundPlayer.PlaySound(entityThatTookDamage.Get<PlaySoundWhenDying>().SoundEffect);
+            }*/
         }
 
         if (entityThatTookDamage.Has<TeleportsWhenTakingDamage>())
@@ -232,14 +232,4 @@ internal record struct ImmunityFramesOnDamage(TimeSpan Duration)
     {
         entity.Get<ImmunityFrames>().Value += entity.Get<ImmunityFramesOnDamage>().Duration;
     }
-}
-
-internal struct PlaySoundWhenPunched(SoundEffect soundEffect)
-{
-    public SoundEffect SoundEffect = soundEffect;
-}
-
-internal struct PlaySoundWhenDying(SoundEffect soundEffect)
-{
-    public SoundEffect SoundEffect = soundEffect;
 }

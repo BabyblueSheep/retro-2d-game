@@ -109,11 +109,13 @@ internal sealed class MainMenuLevelSelectState : GameState
 
     public override void Enter()
     {
-        
+        GameEngine.Logger.LogDebug($"Entering game state {nameof(MainMenuLevelSelectState)}");
     }
 
     public override void Exit()
     {
+        GameEngine.Logger.LogDebug($"Exiting game state {nameof(MainMenuLevelSelectState)}");
+
         if (_levelToGoTo == -1)
             return;
 

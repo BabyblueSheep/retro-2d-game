@@ -1,7 +1,5 @@
-﻿using Retro2DGame.Core.SDL3;
-using SDL3;
+﻿using Retro2DGame.Core.SDLWrappers;
 using System.Drawing;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -45,10 +43,10 @@ internal unsafe sealed class PaletteIndexBitmap : IDisposable
 
     public static PaletteIndexBitmap CreateFromFile(string path)
     {
-        var file = SDL.IOFromFile(path, "rb");
+        var file = SDL3.SDL.IOFromFile(path, "rb");
 
-        SDL.ReadU32BE(file, out var imageWidth);
-        SDL.ReadU32BE(file, out var imageHeight);
+        SDL3.SDL.ReadU32BE(file, out var imageWidth);
+        SDL3.SDL.ReadU32BE(file, out var imageHeight);
 
         var bitmap = CreateEmpty((int)imageWidth, (int)imageHeight);
 
@@ -56,12 +54,12 @@ internal unsafe sealed class PaletteIndexBitmap : IDisposable
         {
             for (int w = 0; w < imageWidth; w++)
             {
-                SDL.ReadU8(file, out var rawPaletteIndex);
+                SDL3.SDL.ReadU8(file, out var rawPaletteIndex);
                 bitmap.WriteIndex(rawPaletteIndex, w, h);
             }
         }
 
-        SDL.CloseIO(file);
+        SDL3.SDL.CloseIO(file);
 
         return bitmap;
     }

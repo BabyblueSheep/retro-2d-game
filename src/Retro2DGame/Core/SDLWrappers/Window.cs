@@ -1,11 +1,6 @@
-﻿using SDL3;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Reflection.Metadata;
-using System.Text;
+﻿using System.Numerics;
 
-namespace Retro2DGame.Core.SDL3;
+namespace Retro2DGame.Core.SDLWrappers;
 
 internal sealed class Window : IDisposable
 {
@@ -13,22 +8,22 @@ internal sealed class Window : IDisposable
     public int Height { get; private set; }
     public Vector2 Size { get; private set; }
 
-    public SDL.PixelFormat PixelFormat
+    public SDL3.SDL.PixelFormat PixelFormat
     {
-        get => SDL.GetWindowPixelFormat(Handle);
+        get => SDL3.SDL.GetWindowPixelFormat(Handle);
     }
 
     public nint Handle { get; }
 
     public bool IsDisposed { get; private set; }
 
-    public Window(string title, int width, int height, SDL.WindowFlags windowFlags)
+    public Window(string title, int width, int height, SDL3.SDL.WindowFlags windowFlags)
     {
-        Handle = SDL.CreateWindow(title, width, height, windowFlags);
+        Handle = SDL3.SDL.CreateWindow(title, width, height, windowFlags);
 
         if (Handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create window: {SDL.GetError()}");
+            throw new Exception($"Couldn't create window: {SDL3.SDL.GetError()}");
         }
 
         Width = width;
@@ -38,12 +33,12 @@ internal sealed class Window : IDisposable
 
     public bool UpdateWindowSurface()
     {
-        return SDL.UpdateWindowSurface(Handle);
+        return SDL3.SDL.UpdateWindowSurface(Handle);
     }
 
     public void UpdateWindowSize()
     {
-        SDL.GetWindowSize(Handle, out var width, out var height);
+        SDL3.SDL.GetWindowSize(Handle, out var width, out var height);
 
         Width = width;
         Height = height;
@@ -59,7 +54,7 @@ internal sealed class Window : IDisposable
                 
             }
 
-            SDL.DestroyWindow(Handle);
+            SDL3.SDL.DestroyWindow(Handle);
 
             IsDisposed = true;
         }

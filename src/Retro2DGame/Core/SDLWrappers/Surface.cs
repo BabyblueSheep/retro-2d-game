@@ -1,8 +1,4 @@
-﻿using Retro2DGame.Core.Game.Rendering;
-using SDL3;
-using System.Drawing;
-
-namespace Retro2DGame.Core.SDL3;
+﻿namespace Retro2DGame.Core.SDLWrappers;
 
 internal sealed class Surface : IDisposable
 {
@@ -11,7 +7,7 @@ internal sealed class Surface : IDisposable
     public int Height => Structure.Height;
 
     public nint Handle { get; }
-    public SDL.Surface Structure { get; }
+    public SDL3.SDL.Surface Structure { get; }
 
     public uint[] PaletteColors { get; }
 
@@ -20,7 +16,7 @@ internal sealed class Surface : IDisposable
     private Surface(nint handle)
     {
         Handle = handle;
-        var structureNullable = SDL.PointerToStructure<SDL.Surface>(Handle);
+        var structureNullable = SDL3.SDL.PointerToStructure<SDL3.SDL.Surface>(Handle);
         if (!structureNullable.HasValue)
         {
             throw new Exception("Surface pointer was invalid");
@@ -30,12 +26,12 @@ internal sealed class Surface : IDisposable
         PaletteColors = new uint[256];
     }
 
-    public static Surface Create(int width, int height, SDL.PixelFormat pixelFormat)
+    public static Surface Create(int width, int height, SDL3.SDL.PixelFormat pixelFormat)
     {
-        var handle = SDL.CreateSurface(width, height, pixelFormat);
+        var handle = SDL3.SDL.CreateSurface(width, height, pixelFormat);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create surface: {SDL.GetError()}");
+            throw new Exception($"Couldn't create surface: {SDL3.SDL.GetError()}");
         }
 
         var surface = new Surface(handle);
@@ -44,10 +40,10 @@ internal sealed class Surface : IDisposable
 
     public static Surface GetFromWindow(Window window)
     {
-        var handle = SDL.GetWindowSurface(window.Handle);
+        var handle = SDL3.SDL.GetWindowSurface(window.Handle);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't create surface: {SDL.GetError()}");
+            throw new Exception($"Couldn't create surface: {SDL3.SDL.GetError()}");
         }
 
         var surface = new Surface(handle);
@@ -56,10 +52,10 @@ internal sealed class Surface : IDisposable
 
     public static Surface LoadPNG(string filepath)
     {
-        var handle = SDL.LoadPNG(filepath);
+        var handle = SDL3.SDL.LoadPNG(filepath);
         if (handle == nint.Zero)
         {
-            throw new Exception($"Couldn't load PNG: {SDL.GetError()}");
+            throw new Exception($"Couldn't load PNG: {SDL3.SDL.GetError()}");
         }
 
         var surface = new Surface(handle);
@@ -68,7 +64,7 @@ internal sealed class Surface : IDisposable
 
     public static bool LockTexture(Texture texture, nint rectangle, out Surface? surface)
     {
-        var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
+        var result = SDL3.SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
         if (!result || handle == nint.Zero)
         {
             surface = null;
@@ -79,9 +75,9 @@ internal sealed class Surface : IDisposable
         return result;
     }
 
-    public static bool LockTexture(Texture texture, SDL.Rect rectangle, out Surface? surface)
+    public static bool LockTexture(Texture texture, SDL3.SDL.Rect rectangle, out Surface? surface)
     {
-        var result = SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
+        var result = SDL3.SDL.LockTextureToSurface(texture.Handle, rectangle, out var handle);
         if (!result || handle == nint.Zero)
         {
             surface = null;
@@ -94,31 +90,31 @@ internal sealed class Surface : IDisposable
 
     public bool BlitSurface(Surface destination, nint sourceRectangle, nint destinationRectangle)
     {
-        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+        return SDL3.SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
     }
 
-    public bool BlitSurface(Surface destination, nint sourceRectangle, SDL.Rect destinationRectangle)
+    public bool BlitSurface(Surface destination, nint sourceRectangle, SDL3.SDL.Rect destinationRectangle)
     {
-        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+        return SDL3.SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
     }
 
-    public bool BlitSurface(Surface destination, SDL.Rect sourceRectangle, nint destinationRectangle)
+    public bool BlitSurface(Surface destination, SDL3.SDL.Rect sourceRectangle, nint destinationRectangle)
     {
-        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+        return SDL3.SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
     }
 
-    public bool BlitSurface(Surface destination, SDL.Rect sourceRectangle, SDL.Rect destinationRectangle)
+    public bool BlitSurface(Surface destination, SDL3.SDL.Rect sourceRectangle, SDL3.SDL.Rect destinationRectangle)
     {
-        return SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
+        return SDL3.SDL.BlitSurface(Handle, sourceRectangle, destination.Handle, destinationRectangle);
     }
 
     public bool LockSurface()
     {
-        return SDL.LockSurface(Handle);
+        return SDL3.SDL.LockSurface(Handle);
     }
     public void UnlockSurface()
     {
-        SDL.UnlockSurface(Handle);
+        SDL3.SDL.UnlockSurface(Handle);
     }
 
     private void Dispose(bool disposing)
@@ -130,7 +126,7 @@ internal sealed class Surface : IDisposable
 
             }
 
-            SDL.DestroySurface(Handle);
+            SDL3.SDL.DestroySurface(Handle);
 
             IsDisposed = true;
         }

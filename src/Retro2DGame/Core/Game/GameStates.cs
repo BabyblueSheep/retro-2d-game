@@ -1,5 +1,5 @@
 ﻿using Retro2DGame.Core.Game.Rendering;
-using Retro2DGame.Core.SDL3;
+using Retro2DGame.Core.SDLWrappers;
 
 namespace Retro2DGame.Core.Game;
 

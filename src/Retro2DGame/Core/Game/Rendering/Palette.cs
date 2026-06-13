@@ -1,4 +1,4 @@
-﻿using Retro2DGame.Core.SDL3;
+﻿using Retro2DGame.Core.SDLWrappers;
 using SDL3;
 using System;
 using System.Collections.Generic;
@@ -48,7 +48,7 @@ internal static class SurfacePaletteExtensions
         {
             for (int i = 0; i < 256; i++)
             {
-                surface.PaletteColors[i] = SDL.MapSurfaceRGBA(surface.Handle, palette[i].R, palette[i].G, palette[i].B, palette[i].A);
+                surface.PaletteColors[i] = SDL3.SDL.MapSurfaceRGBA(surface.Handle, palette[i].R, palette[i].G, palette[i].B, palette[i].A);
             }
         }
     }
