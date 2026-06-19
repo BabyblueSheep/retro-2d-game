@@ -31,8 +31,6 @@ internal sealed class GameEngine : IDisposable
     private readonly Renderer _windowRenderer;
     private readonly Texture _windowTexture;
 
-    private readonly ConsistentRandom _random;
-
 
     public Inputs Inputs { get; }
     public GameStateStack GameStates { get; }
@@ -41,8 +39,8 @@ internal sealed class GameEngine : IDisposable
     public Palette Palette { get; }
     public PaletteIndexBitmap Bitmap { get; }
 
-    public IndependentAudioPlayer MusicPlayer { get; }
-    public IndependentAudioPlayer SoundPlayer { get; }
+    public AudioPlayer MusicPlayer { get; }
+    public AudioPlayer SoundPlayer { get; }
 
     public Window Window { get; }
 
@@ -85,10 +83,9 @@ internal sealed class GameEngine : IDisposable
         Palette = new Palette();
         Bitmap = PaletteIndexBitmap.CreateEmpty(GAME_WIDTH, GAME_HEIGHT);
 
-        MusicPlayer = new IndependentAudioPlayer(4);
-        SoundPlayer = new IndependentAudioPlayer(16);
+        MusicPlayer = new AudioPlayer(4);
+        SoundPlayer = new AudioPlayer(16);
 
-        _random = new ConsistentRandom();
 
 
         Palette[0, 0] = Color.Transparent;
@@ -205,11 +202,6 @@ internal sealed class GameEngine : IDisposable
             }
 
             state.Render(frameProgress);
-        }
-
-        if (Inputs.IsMouseLeftClickDown && !Inputs.WasMouseLeftClickDown)
-        {
-            SoundPlayer.Play(AssetStorage.Audio.Hurt3, AudioPlayParameters.Default with { Pitch = _random.RandomFloat(0.1f, 0.3f) });
         }
 
         PresentBitmap();

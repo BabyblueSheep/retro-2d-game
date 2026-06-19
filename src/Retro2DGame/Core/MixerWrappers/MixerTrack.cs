@@ -38,6 +38,11 @@ internal sealed class MixerTrack : IDisposable
         return SDL3.Mixer.SetTrackFrequencyRatio(Handle, frequencyRatio);
     }
 
+    public float GetGain()
+    {
+        return SDL3.Mixer.GetTrackGain(Handle);
+    }
+
     public bool SetGain(float gain)
     {
         return SDL3.Mixer.SetTrackGain(Handle, gain);
@@ -48,9 +53,9 @@ internal sealed class MixerTrack : IDisposable
         return SDL3.Mixer.PauseTrack(Handle);
     }
 
-    public bool Play()
+    public bool Play(uint options)
     {
-        return SDL3.Mixer.PlayTrack(Handle, 0);
+        return SDL3.Mixer.PlayTrack(Handle, options);
     }
 
     public bool Resume()

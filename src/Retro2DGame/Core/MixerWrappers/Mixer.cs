@@ -24,9 +24,39 @@ internal sealed class Mixer : IDisposable
         return mixer;
     }
 
+    public void Lock()
+    {
+        //SDL3.Mixer.LockMixer
+    }
+
+    public void Unlock()
+    {
+        //SDL3.Mixer.LockMixer
+    }
+
+    public bool PauseAllTracks()
+    {
+        return SDL3.Mixer.PauseAllTracks(Handle);
+    }
+
+    public bool ResumeAllTracks()
+    {
+        return SDL3.Mixer.ResumeAllTracks(Handle);
+    }
+
+    public bool StopAllTracks()
+    {
+        return SDL3.Mixer.StopAllTracks(Handle, 0);
+    }
+
     public bool SetFrequencyRatio(float frequencyRatio)
     {
         return SDL3.Mixer.SetMixerFrequencyRatio(Handle, frequencyRatio);
+    }
+
+    public float GetGain()
+    {
+        return SDL3.Mixer.GetMixerGain(Handle);
     }
 
     public bool SetGain(float gain)

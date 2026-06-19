@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Retro2DGame.Core.Game.Audio;
 
-namespace Retro2DGame.Core.Game.Audio;
-
-internal struct AudioPlayParameters
+public struct AudioPlayParameters
 {
-    public static AudioPlayParameters Default = new AudioPlayParameters() with { Volume = 1, Pitch = 1 };
+    public AudioPlayParameters() { }
 
-    public float Volume { get; set; }
-    public float Pitch { get; set; }
+    public float Volume { get; set; } = 1f;
+    public float Pitch { get; set; } = 1f;
+
+    public bool ShouldLoop { get; set; } = false;
+    public bool IsImportant { get; set; } = false;
 }

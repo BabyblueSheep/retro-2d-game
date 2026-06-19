@@ -1,18 +1,24 @@
-using Retro2DGame.Core.NetExtensions;
+using Retro2DGame.Core;
 using Retro2DGame.Core.Game;
+using Retro2DGame.Core.Game.Audio;
 using Retro2DGame.Core.Game.Rendering;
 using Retro2DGame.Core.Game.UI;
+using Retro2DGame.Core.NetExtensions;
 using Retro2DGame.Core.SDLWrappers;
 using Retro2DGame.Core.SDLWrappers.Extensions;
 using SDL3;
 using System.Drawing;
 using System.Numerics;
+using static Retro2DGame.Core.Game.Audio.AudioPlayer;
 
 namespace Retro2DGame.Content.GameStates.MenuStates;
 
 internal sealed class MainMenuMainState : GameState
 {
     private readonly UIButtonGroup _buttonGroup;
+
+    private readonly ConsistentRandom _random;
+    private IndependentAudioHandle? _audioHandle;
 
     public MainMenuMainState(GameEngine engine) : base(engine)
     {
@@ -68,6 +74,9 @@ internal sealed class MainMenuMainState : GameState
                 TextAlignment = TextRenderer.TextAlignment.Right,
             }
         );
+
+        
+       _random = new ConsistentRandom(1);
     }
 
     public override void Enter()
@@ -100,6 +109,32 @@ internal sealed class MainMenuMainState : GameState
             GameEngine.Inputs.MousePosition, GameEngine.Inputs.IsMouseLeftClickDown,
             GameEngine.Inputs.PreviousMousePosition, GameEngine.Inputs.WasMouseLeftClickDown
         );
+
+
+        
+        if (GameEngine.Inputs.IsMouseLeftClickDown && !GameEngine.Inputs.WasMouseLeftClickDown)
+        {
+            GameEngine.SoundPlayer.Play(GameEngine.AssetStorage.Audio.Hurt3, new AudioPlayParameters() with 
+            { 
+                Pitch = _random.RandomFloat(0.8f, 1.2f) 
+            });
+        }
+        if (GameEngine.Inputs.IsMouseRightClickDown && !GameEngine.Inputs.WasMouseRightClickDown)
+        {
+            if (_audioHandle != null)
+            {
+                _audioHandle.Stop();
+                _audioHandle = null;
+            }
+            else
+            {
+                _audioHandle = GameEngine.SoundPlayer.Play(GameEngine.AssetStorage.Audio.Hurt3, new AudioPlayParameters() with 
+                { 
+                    Pitch = _random.RandomFloat(0.3f, 0.5f),
+                    ShouldLoop = true
+                });
+            }
+        }
     }
 
     public override void FixedUpdate(TimeSpan delta)
